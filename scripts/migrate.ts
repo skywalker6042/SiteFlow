@@ -7,6 +7,19 @@
  * Run with: npx tsx scripts/migrate.ts
  */
 import postgres from 'postgres'
+import { readFileSync } from 'fs'
+import { resolve } from 'path'
+
+// Load .env.local if DATABASE_URL not already set
+if (!process.env.DATABASE_URL) {
+  try {
+    const env = readFileSync(resolve(process.cwd(), '.env.local'), 'utf8')
+    for (const line of env.split('\n')) {
+      const match = line.match(/^([^#=]+)=(.*)$/)
+      if (match) process.env[match[1].trim()] = match[2].trim()
+    }
+  } catch {}
+}
 
 const sql = postgres(process.env.DATABASE_URL ?? '')
 
