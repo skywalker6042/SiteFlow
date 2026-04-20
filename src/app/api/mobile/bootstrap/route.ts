@@ -163,11 +163,9 @@ export async function GET() {
   const plan = ((org?.plan ?? 'trial') as PlanTier)
   const planFeatureRows = await sql`SELECT value FROM platform_settings WHERE key = ${'plan_features_' + plan}` as Array<{ value: string }>
 
-  const enabledFeatures: FeatureKey[] = user.platformRole === 'admin'
-    ? ALL_FEATURES
-    : planFeatureRows[0]?.value
-      ? JSON.parse(planFeatureRows[0].value)
-      : DEFAULT_PLAN_FEATURES[plan]
+  const enabledFeatures: FeatureKey[] = planFeatureRows[0]?.value
+    ? JSON.parse(planFeatureRows[0].value)
+    : DEFAULT_PLAN_FEATURES[plan]
 
   return NextResponse.json({
     user: {
