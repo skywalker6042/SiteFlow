@@ -34,36 +34,6 @@ export async function GET() {
     })
   }
 
-  await sql`ALTER TABLE organizations ADD COLUMN IF NOT EXISTS logo_url TEXT`
-  await sql`ALTER TABLE organizations ADD COLUMN IF NOT EXISTS phone TEXT`
-  await sql`
-    CREATE TABLE IF NOT EXISTS org_roles (
-      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      org_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
-      name TEXT NOT NULL,
-      color TEXT NOT NULL DEFAULT '#6b7280',
-      permissions JSONB NOT NULL DEFAULT '{}',
-      created_at TIMESTAMPTZ DEFAULT NOW()
-    )
-  `
-  await sql`ALTER TABLE org_members ADD COLUMN IF NOT EXISTS org_role_id UUID REFERENCES org_roles(id) ON DELETE SET NULL`
-  await sql`
-    ALTER TABLE organizations
-    ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'trial',
-    ADD COLUMN IF NOT EXISTS track_worker_time BOOLEAN NOT NULL DEFAULT false,
-    ADD COLUMN IF NOT EXISTS co_separate_invoice BOOLEAN NOT NULL DEFAULT false,
-    ADD COLUMN IF NOT EXISTS require_signature BOOLEAN NOT NULL DEFAULT false,
-    ADD COLUMN IF NOT EXISTS track_worker_job BOOLEAN NOT NULL DEFAULT false,
-    ADD COLUMN IF NOT EXISTS plan TEXT NOT NULL DEFAULT 'trial'
-  `
-  await sql`
-    CREATE TABLE IF NOT EXISTS platform_settings (
-      key        TEXT PRIMARY KEY,
-      value      TEXT NOT NULL,
-      updated_at TIMESTAMPTZ DEFAULT NOW()
-    )
-  `
-
   const now = new Date()
   const year = now.getFullYear()
   const month = now.getMonth() + 1

@@ -28,22 +28,7 @@ function hashToken(token: string) {
   return createHash('sha256').update(token).digest('hex')
 }
 
-export async function ensureMobileSessionTable() {
-  await sql`
-    CREATE TABLE IF NOT EXISTS mobile_sessions (
-      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      session_token_hash TEXT NOT NULL UNIQUE,
-      expires_at TIMESTAMPTZ NOT NULL,
-      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    )
-  `
-  await sql`CREATE INDEX IF NOT EXISTS mobile_sessions_user_id_idx ON mobile_sessions(user_id)`
-  await sql`CREATE INDEX IF NOT EXISTS mobile_sessions_expires_at_idx ON mobile_sessions(expires_at)`
-}
-
 export async function createMobileSession(userId: string) {
-  await ensureMobileSessionTable()
 
   const rawToken = randomBytes(32).toString('hex')
   const expiresAt = new Date(Date.now() + MOBILE_SESSION_TTL_MS).toISOString()
@@ -64,7 +49,6 @@ export async function createMobileSession(userId: string) {
 }
 
 export async function clearMobileSession() {
-  await ensureMobileSessionTable()
 
   const cookieStore = await cookies()
   const rawToken = cookieStore.get(MOBILE_SESSION_COOKIE)?.value
@@ -83,7 +67,6 @@ export async function clearMobileSession() {
 }
 
 export async function getMobileSessionUser(): Promise<AppUser | null> {
-  await ensureMobileSessionTable()
 
   const cookieStore = await cookies()
   const rawToken = cookieStore.get(MOBILE_SESSION_COOKIE)?.value
