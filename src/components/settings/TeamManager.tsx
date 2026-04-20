@@ -98,12 +98,12 @@ export function TeamManager({ initialTeams, allWorkers }: TeamManagerProps) {
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               placeholder="Team name"
-              className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+              className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
             />
             <button
               type="submit"
               disabled={adding || !newName.trim()}
-              className="px-3 py-2 bg-orange-500 text-white text-sm rounded-lg hover:bg-orange-600 disabled:opacity-50 font-medium flex items-center gap-1"
+              className="px-3 py-2 bg-teal-500 text-white text-sm rounded-lg hover:bg-teal-600 disabled:opacity-50 font-medium flex items-center gap-1"
             >
               <Plus size={14} />
               Add
@@ -154,7 +154,7 @@ export function TeamManager({ initialTeams, allWorkers }: TeamManagerProps) {
                     </div>
                     <button
                       onClick={() => toggleExpand(team.id)}
-                      className="text-xs text-orange-500 font-medium hover:text-orange-600 px-1"
+                      className="text-xs text-teal-500 font-medium hover:text-teal-600 px-1"
                     >
                       {isExpanded ? 'Done' : 'Edit Members'}
                     </button>
@@ -177,12 +177,12 @@ export function TeamManager({ initialTeams, allWorkers }: TeamManagerProps) {
                               onClick={() => toggleMember(team.id, worker.id)}
                               className={cn(
                                 'flex items-center gap-2 px-2 py-1.5 rounded-lg text-left transition-colors',
-                                checked ? 'bg-orange-50' : 'hover:bg-white'
+                                checked ? 'bg-teal-50' : 'hover:bg-white'
                               )}
                             >
                               <div className={cn(
                                 'w-4 h-4 rounded border flex items-center justify-center flex-shrink-0',
-                                checked ? 'bg-orange-500 border-orange-500' : 'border-gray-300 bg-white'
+                                checked ? 'bg-teal-500 border-teal-500' : 'border-gray-300 bg-white'
                               )}>
                                 {checked && <Check size={9} className="text-white" />}
                               </div>
@@ -204,7 +204,7 @@ export function TeamManager({ initialTeams, allWorkers }: TeamManagerProps) {
                         <button
                           onClick={() => saveMembers(team.id)}
                           disabled={savingMembers === team.id}
-                          className="flex items-center gap-1 text-xs bg-orange-500 text-white px-3 py-1.5 rounded-lg hover:bg-orange-600 disabled:opacity-50 font-medium"
+                          className="flex items-center gap-1 text-xs bg-teal-500 text-white px-3 py-1.5 rounded-lg hover:bg-teal-600 disabled:opacity-50 font-medium"
                         >
                           <Check size={12} />
                           {savingMembers === team.id ? 'Saving...' : 'Save Members'}

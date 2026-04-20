@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus, Trash2, Check, ClipboardList } from 'lucide-react'
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
@@ -11,18 +11,12 @@ import type { JobTask, JobPhase, TaskStatus } from '@/types'
 
 const STATUS_STYLES: Record<TaskStatus, string> = {
   todo:        'border-gray-300 text-gray-400',
-  in_progress: 'border-blue-400 text-blue-500 bg-blue-50',
+  in_progress: 'border-gray-300 text-gray-400',
   done:        'border-green-500 text-green-600 bg-green-50',
 }
-const NEXT_STATUS: Record<TaskStatus, TaskStatus> = {
-  todo: 'in_progress',
-  in_progress: 'done',
-  done: 'todo',
-}
-const STATUS_ICONS: Record<TaskStatus, string> = {
-  todo: '○',
-  in_progress: '◑',
-  done: '●',
+
+function toggleStatus(current: TaskStatus): TaskStatus {
+  return current === 'done' ? 'todo' : 'done'
 }
 
 interface TaskListProps {
@@ -37,6 +31,9 @@ export function TaskList({ jobId, initialTasks, phases, canManage = true, canCom
   const router = useRouter()
   const [tasks, setTasks] = useState<JobTask[]>(initialTasks)
   const [showAdd, setShowAdd] = useState(false)
+
+  // Sync when server re-renders after router.refresh() (e.g. job marked done)
+  useEffect(() => { setTasks(initialTasks) }, [initialTasks])
   const [newName, setNewName] = useState('')
   const [newPhaseId, setNewPhaseId] = useState('')
   const [adding, setAdding] = useState(false)
@@ -69,7 +66,7 @@ export function TaskList({ jobId, initialTasks, phases, canManage = true, canCom
   }
 
   async function handleStatusCycle(task: JobTask) {
-    const next = NEXT_STATUS[task.status]
+    const next = toggleStatus(task.status)
     setTasks((prev) => prev.map((t) => t.id === task.id ? { ...t, status: next } : t))
     await fetch(`/api/job-tasks/${task.id}`, {
       method: 'PATCH',
@@ -119,7 +116,7 @@ export function TaskList({ jobId, initialTasks, phases, canManage = true, canCom
           {canManage && (
             <button
               onClick={() => setShowAdd((v) => !v)}
-              className="flex items-center gap-1 text-xs text-orange-500 font-medium"
+              className="flex items-center gap-1 text-xs text-teal-500 font-medium"
             >
               <Plus size={13} />
               Add Task
@@ -142,12 +139,12 @@ export function TaskList({ jobId, initialTasks, phases, canManage = true, canCom
                 placeholder="Task name"
                 required
                 autoFocus
-                className="flex-1 rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                className="flex-1 rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
               />
               <button
                 type="submit"
                 disabled={adding || !newName.trim()}
-                className="px-3 py-1.5 bg-orange-500 text-white text-sm rounded-lg hover:bg-orange-600 disabled:opacity-50 font-medium"
+                className="px-3 py-1.5 bg-teal-500 text-white text-sm rounded-lg hover:bg-teal-600 disabled:opacity-50 font-medium"
               >
                 {adding ? '...' : 'Add'}
               </button>
@@ -159,7 +156,7 @@ export function TaskList({ jobId, initialTasks, phases, canManage = true, canCom
               <select
                 value={newPhaseId}
                 onChange={(e) => setNewPhaseId(e.target.value)}
-                className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 text-gray-600"
+                className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 text-gray-600"
               >
                 <option value="">No phase (general)</option>
                 {phases.map((p) => (
@@ -176,7 +173,7 @@ export function TaskList({ jobId, initialTasks, phases, canManage = true, canCom
           <div>
             <p className="text-sm text-gray-400 mb-2">No tasks yet</p>
             {canManage && (
-              <button onClick={() => setShowAdd(true)} className="text-xs text-orange-500 font-medium">
+              <button onClick={() => setShowAdd(true)} className="text-xs text-teal-500 font-medium">
                 Add your first task
               </button>
             )}
@@ -203,9 +200,9 @@ export function TaskList({ jobId, initialTasks, phases, canManage = true, canCom
                           STATUS_STYLES[task.status],
                           !canComplete && !canManage && 'cursor-default'
                         )}
-                        title={(canComplete || canManage) ? `${task.status} — tap to advance` : task.status}
+                        title={(canComplete || canManage) ? (task.status === 'done' ? 'Done — tap to undo' : 'Tap to complete') : task.status}
                       >
-                        {task.status === 'done' ? <Check size={10} /> : STATUS_ICONS[task.status]}
+                        {task.status === 'done' ? <Check size={10} /> : null}
                       </button>
 
                       <span className={cn(

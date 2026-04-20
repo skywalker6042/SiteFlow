@@ -29,22 +29,23 @@ export function calcTaskProgress(tasks: JobTask[]): number {
 /**
  * Determine overall progress with full priority chain:
  *  tasks (if any) > phases (if any) > manual percent_complete
+ * If jobStatus is 'done', always returns 100.
  */
 export function calcOverallProgress(
   tasks: JobTask[],
   phases: JobPhase[],
-  manualPct: number
+  manualPct: number,
+  jobStatus?: string
 ): number {
+  if (jobStatus === 'done') return 100
   if (tasks.length > 0) return calcTaskProgress(tasks)
   if (phases.length > 0) return calcProgress(phases)
   return manualPct
 }
 
 /**
- * Cycle phase status forward: not_started → in_progress → done → not_started
+ * Toggle phase: anything that isn't done → done, done → not_started
  */
 export function nextStatus(current: JobPhase['status']): JobPhase['status'] {
-  if (current === 'not_started') return 'in_progress'
-  if (current === 'in_progress') return 'done'
-  return 'not_started'
+  return current === 'done' ? 'not_started' : 'done'
 }

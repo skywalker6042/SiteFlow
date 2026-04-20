@@ -44,7 +44,7 @@ export function EditMemberEmail({ orgId, userId, initialEmail }: { orgId: string
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => e.key === 'Escape' && setEditing(false)}
             placeholder="Email"
-            className="text-sm border border-gray-300 rounded px-2 py-1 outline-none focus:border-orange-400 w-48"
+            className="text-sm border border-gray-300 rounded px-2 py-1 outline-none focus:border-teal-400 w-48"
           />
           <input
             type="password"
@@ -52,7 +52,7 @@ export function EditMemberEmail({ orgId, userId, initialEmail }: { orgId: string
             onChange={(e) => setPassword(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') save(); if (e.key === 'Escape') setEditing(false) }}
             placeholder="New password (optional)"
-            className="text-sm border border-gray-300 rounded px-2 py-1 outline-none focus:border-orange-400 w-44"
+            className="text-sm border border-gray-300 rounded px-2 py-1 outline-none focus:border-teal-400 w-44"
           />
           <button onClick={save} disabled={loading} className="text-green-600 hover:text-green-700 disabled:opacity-50">
             {loading ? <Loader size={14} className="animate-spin" /> : <Check size={14} />}
@@ -71,7 +71,7 @@ export function EditMemberEmail({ orgId, userId, initialEmail }: { orgId: string
       <p className="text-sm font-medium text-gray-900">{email}</p>
       <button
         onClick={() => { setDraft(email); setEditing(true) }}
-        className="text-gray-300 hover:text-orange-500 opacity-0 group-hover:opacity-100 transition-opacity"
+        className="text-gray-300 hover:text-teal-500 opacity-0 group-hover:opacity-100 transition-opacity"
         title="Edit email / password"
       >
         <Pencil size={12} />

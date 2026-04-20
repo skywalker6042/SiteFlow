@@ -134,7 +134,7 @@ export function WorkDayList({ jobId, initialWorkDays, allWorkers, teams, canMana
             {canManage && (
               <button
                 onClick={() => { setShowPicker((v) => !v); setSelectedDates(new Set()) }}
-                className="flex items-center gap-1 text-xs text-orange-500 font-medium"
+                className="flex items-center gap-1 text-xs text-teal-500 font-medium"
               >
                 <Plus size={13} /> Add Days
               </button>
@@ -180,9 +180,9 @@ export function WorkDayList({ jobId, initialWorkDays, allWorkers, teams, canMana
                       className={cn(
                         'w-full aspect-square flex items-center justify-center text-xs rounded-full font-medium transition-colors',
                         isScheduled  ? 'text-gray-300 cursor-default' :
-                        isSelected   ? 'bg-orange-500 text-white' :
+                        isSelected   ? 'bg-teal-500 text-white' :
                         isPast       ? 'text-gray-300 hover:bg-gray-50' :
-                                       'text-gray-700 hover:bg-orange-50 hover:text-orange-600'
+                                       'text-gray-700 hover:bg-teal-50 hover:text-teal-600'
                       )}
                     >
                       {day}
@@ -202,7 +202,7 @@ export function WorkDayList({ jobId, initialWorkDays, allWorkers, teams, canMana
                   <button
                     onClick={handleAddDays}
                     disabled={adding || selectedDates.size === 0}
-                    className="text-xs bg-orange-500 hover:bg-orange-600 disabled:opacity-40 text-white font-medium px-3 py-1.5 rounded-lg transition-colors"
+                    className="text-xs bg-teal-500 hover:bg-teal-600 disabled:opacity-40 text-white font-medium px-3 py-1.5 rounded-lg transition-colors"
                   >
                     {adding ? 'Adding…' : `Add ${selectedDates.size > 0 ? selectedDates.size : ''}`}
                   </button>
@@ -217,7 +217,7 @@ export function WorkDayList({ jobId, initialWorkDays, allWorkers, teams, canMana
             <div>
               <p className="text-sm text-gray-400 mb-2">No work days scheduled</p>
               {canManage && (
-                <button onClick={() => setShowPicker(true)} className="text-xs text-orange-500 font-medium">
+                <button onClick={() => setShowPicker(true)} className="text-xs text-teal-500 font-medium">
                   Schedule the first day
                 </button>
               )}
@@ -247,7 +247,7 @@ export function WorkDayList({ jobId, initialWorkDays, allWorkers, teams, canMana
                         <span key={w.id} className="text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-full font-medium">{w.name}</span>
                       ))}
                       {canManage && (
-                        <button onClick={() => setCrewDay(day)} className="flex items-center gap-0.5 text-[10px] text-orange-500 font-medium hover:text-orange-600">
+                        <button onClick={() => setCrewDay(day)} className="flex items-center gap-0.5 text-[10px] text-teal-500 font-medium hover:text-teal-600">
                           <Users size={10} />
                           {day.workers.length === 0 ? 'Assign crew' : 'Edit'}
                         </button>

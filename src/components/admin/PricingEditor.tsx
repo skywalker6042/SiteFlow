@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Save, Check } from 'lucide-react'
 
-const inp = 'w-full text-sm border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:border-orange-400 bg-white'
+const inp = 'w-full text-sm border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:border-teal-400 bg-white'
 
 const FIELDS = [
   { key: 'price_trial_days', label: 'Trial Duration (days)',    prefix: '',  suffix: 'days', hint: 'How long the free trial lasts' },

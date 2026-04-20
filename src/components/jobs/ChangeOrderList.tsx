@@ -89,7 +89,7 @@ export function ChangeOrderList({
             {canManage && (
               <button
                 onClick={() => { setOpen(true); setError('') }}
-                className="flex items-center gap-1 text-xs text-orange-500 font-medium hover:text-orange-600"
+                className="flex items-center gap-1 text-xs text-teal-500 font-medium hover:text-teal-600"
               >
                 <Plus size={13} /> Add
               </button>

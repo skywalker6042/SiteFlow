@@ -37,10 +37,10 @@ export function ClientPhotoUpload({ token, initialPhotos }: { token: string; ini
         <button
           onClick={() => inputRef.current?.click()}
           disabled={uploading}
-          className="flex items-center gap-1.5 text-xs font-medium text-orange-600 border border-orange-200 bg-orange-50 hover:bg-orange-100 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
+          className="flex items-center gap-1.5 text-xs font-medium text-teal-600 border border-teal-200 bg-teal-50 hover:bg-teal-100 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
         >
           {uploading ? (
-            <span className="w-3 h-3 border-2 border-orange-400 border-t-transparent rounded-full animate-spin" />
+            <span className="w-3 h-3 border-2 border-teal-400 border-t-transparent rounded-full animate-spin" />
           ) : done ? (
             <><Check size={12} /> Uploaded!</>
           ) : (
@@ -60,7 +60,7 @@ export function ClientPhotoUpload({ token, initialPhotos }: { token: string; ini
       {photos.length === 0 ? (
         <button
           onClick={() => inputRef.current?.click()}
-          className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center text-sm text-gray-400 hover:border-orange-300 hover:text-orange-400 transition-colors"
+          className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center text-sm text-gray-400 hover:border-teal-300 hover:text-teal-400 transition-colors"
         >
           Tap to upload photos from your device
         </button>

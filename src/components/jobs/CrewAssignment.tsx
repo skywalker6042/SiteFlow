@@ -59,7 +59,7 @@ export function CrewAssignment({ jobId, initialWorkers, allWorkers }: CrewAssign
                 setSelected(new Set(initialWorkers.map((w) => w.id)))
                 setOpen(true)
               }}
-              className="flex items-center gap-1 text-xs text-orange-500 font-medium"
+              className="flex items-center gap-1 text-xs text-teal-500 font-medium"
             >
               <Edit2 size={12} />
               Manage
@@ -68,7 +68,7 @@ export function CrewAssignment({ jobId, initialWorkers, allWorkers }: CrewAssign
         </CardHeader>
         <CardBody>
           {assignedWorkers.length === 0 ? (
-            <button onClick={() => setOpen(true)} className="text-sm text-gray-400 hover:text-orange-500 transition-colors">
+            <button onClick={() => setOpen(true)} className="text-sm text-gray-400 hover:text-teal-500 transition-colors">
               No crew assigned — tap to assign
             </button>
           ) : (
@@ -80,7 +80,7 @@ export function CrewAssignment({ jobId, initialWorkers, allWorkers }: CrewAssign
                     {w.specialties?.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-0.5">
                         {w.specialties.map((s) => (
-                          <span key={s.id} className="text-[10px] bg-orange-50 text-orange-600 px-1.5 py-0.5 rounded-full">
+                          <span key={s.id} className="text-[10px] bg-teal-50 text-teal-600 px-1.5 py-0.5 rounded-full">
                             {s.name}
                           </span>
                         ))}
@@ -88,7 +88,7 @@ export function CrewAssignment({ jobId, initialWorkers, allWorkers }: CrewAssign
                     )}
                   </div>
                   {w.phone && (
-                    <a href={`tel:${w.phone}`} className="text-orange-500 p-1.5 hover:bg-orange-50 rounded-lg flex-shrink-0">
+                    <a href={`tel:${w.phone}`} className="text-teal-500 p-1.5 hover:bg-teal-50 rounded-lg flex-shrink-0">
                       <Phone size={14} />
                     </a>
                   )}
@@ -116,7 +116,7 @@ export function CrewAssignment({ jobId, initialWorkers, allWorkers }: CrewAssign
                       type="checkbox"
                       checked={checked}
                       onChange={() => toggleWorker(worker.id)}
-                      className="mt-0.5 w-4 h-4 rounded accent-orange-500 flex-shrink-0"
+                      className="mt-0.5 w-4 h-4 rounded accent-teal-500 flex-shrink-0"
                     />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900">{worker.name}</p>
@@ -127,7 +127,7 @@ export function CrewAssignment({ jobId, initialWorkers, allWorkers }: CrewAssign
                           </span>
                         )}
                         {worker.specialties?.map((s) => (
-                          <span key={s.id} className="text-[10px] bg-orange-50 text-orange-600 px-1.5 py-0.5 rounded-full">
+                          <span key={s.id} className="text-[10px] bg-teal-50 text-teal-600 px-1.5 py-0.5 rounded-full">
                             {s.name}
                           </span>
                         ))}

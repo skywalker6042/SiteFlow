@@ -43,7 +43,7 @@ export function AddMemberForm({ orgId }: { orgId: string }) {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-1.5 text-sm text-orange-600 hover:text-orange-700 font-medium transition-colors"
+        className="flex items-center gap-1.5 text-sm text-teal-600 hover:text-teal-700 font-medium transition-colors"
       >
         <UserPlus size={14} /> Add Member
       </button>
@@ -68,7 +68,7 @@ export function AddMemberForm({ orgId }: { orgId: string }) {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="owner@company.com"
               required
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
             />
           </div>
           <div>
@@ -79,7 +79,7 @@ export function AddMemberForm({ orgId }: { orgId: string }) {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Temporary password"
               required
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
             />
           </div>
           <div>
@@ -87,7 +87,7 @@ export function AddMemberForm({ orgId }: { orgId: string }) {
             <select
               value={role}
               onChange={(e) => setRole(e.target.value as 'owner' | 'worker')}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
             >
               <option value="owner">Owner (full access)</option>
               <option value="worker">Worker (limited access)</option>
@@ -105,7 +105,7 @@ export function AddMemberForm({ orgId }: { orgId: string }) {
             <button
               type="submit"
               disabled={loading || !email.trim() || !password}
-              className="flex-1 bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white text-sm font-medium py-2 rounded-lg transition-colors"
+              className="flex-1 bg-teal-500 hover:bg-teal-600 disabled:opacity-50 text-white text-sm font-medium py-2 rounded-lg transition-colors"
             >
               {loading ? 'Adding…' : 'Add Member'}
             </button>

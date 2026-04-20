@@ -1,160 +1,216 @@
 import SwiftUI
 
 struct DashboardView: View {
+    @EnvironmentObject private var appModel: AppModel
+
+    private var greeting: String {
+        let hour = Calendar.current.component(.hour, from: Date())
+        if hour < 12 { return "Good Morning" }
+        if hour < 17 { return "Good Afternoon" }
+        return "Good Evening"
+    }
+
     var body: some View {
-        NavigationView {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    Text(greeting())
-                        .font(.largeTitle)
-                        .padding(.horizontal)
-
-                    // KPI Cards
-                    HStack(spacing: 10) {
-                        KPICard(title: "Total Owed", value: "$5,000.00", icon: "dollarsign.circle")
-                        KPICard(title: "Total Billed", value: "$15,000.00", icon: "doc.text")
-                        KPICard(title: "Active Jobs", value: "3", icon: "briefcase")
-                    }
-                    .padding(.horizontal)
-
-                    // Active Jobs
-                    VStack(alignment: .leading, spacing: 10) {
-                        HStack {
-                            Text("Active Jobs")
-                                .font(.headline)
-                            Spacer()
-                            NavigationLink(destination: JobsView()) {
-                                Text("See All")
-                                    .foregroundColor(.blue)
-                            }
-                        }
-                        .padding(.horizontal)
-
-                        ForEach(0..<3) { _ in
-                            JobCard()
-                        }
-                    }
-
-                    // Upcoming Work Days
-                    VStack(alignment: .leading, spacing: 10) {
-                        HStack {
-                            Text("Upcoming Work Days")
-                                .font(.headline)
-                            Spacer()
-                            NavigationLink(destination: CalendarView()) {
-                                Text("See All")
-                                    .foregroundColor(.blue)
-                            }
-                        }
-                        .padding(.horizontal)
-
-                        ForEach(0..<2) { _ in
-                            WorkDayCard()
-                        }
-                    }
-                }
-                .padding(.vertical)
+        NavigationStack {
+            SiteFlowScreen(title: "Dashboard") {
+                header
+                kpis
+                upcomingDays
+                activeJobs
             }
-            .navigationTitle("Dashboard")
+            .refreshable {
+                try? await appModel.refresh()
+            }
         }
     }
 
-    private func greeting() -> String {
-        let hour = Calendar.current.component(.hour, from: Date())
-        if hour < 12 {
-            return "Good Morning"
-        } else if hour < 17 {
-            return "Good Afternoon"
-        } else {
-            return "Good Evening"
+    private var header: some View {
+        ZStack(alignment: .bottomLeading) {
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .fill(
+                    LinearGradient(
+                        colors: [SiteFlowPalette.ink, Color.black.opacity(0.84)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+
+            VStack(alignment: .leading, spacing: 18) {
+                OrgPill(name: appModel.orgName, subtitle: "General Contractor")
+
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("\(greeting), \(appModel.orgName)")
+                        .font(.system(size: 24, weight: .bold))
+                        .foregroundStyle(.white)
+                    Text("Here’s what’s going on across the business right now.")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(Color.white.opacity(0.68))
+                }
+            }
+            .padding(20)
+        }
+        .frame(height: 186)
+    }
+
+    private var kpis: some View {
+        let dashboard = appModel.bootstrap?.dashboard
+
+        return LazyVGrid(columns: [
+            GridItem(.flexible(), spacing: 12),
+            GridItem(.flexible(), spacing: 12)
+        ], spacing: 12) {
+            KpiView(title: "In Progress", value: "\(dashboard?.activeCount ?? 0)", icon: "hammer.fill", accent: SiteFlowPalette.teal)
+
+            if appModel.bootstrap?.user.permissions.canViewJobFinancials == true || appModel.bootstrap?.user.isOwner == true {
+                KpiView(title: "Outstanding", value: formatCurrency(dashboard?.totalOwed ?? 0), icon: "exclamationmark.circle.fill", accent: SiteFlowPalette.red)
+                KpiView(title: "Billed", value: formatCurrency(dashboard?.totalBilled ?? 0), icon: "chart.line.uptrend.xyaxis", accent: SiteFlowPalette.blue)
+                KpiView(title: "Unbilled", value: formatCurrency(dashboard?.totalUnbilled ?? 0), icon: "dollarsign.circle.fill", accent: SiteFlowPalette.amber)
+            }
+        }
+    }
+
+    private var upcomingDays: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            SiteFlowSectionHeader("Next 7 Days")
+
+            let upcoming = appModel.bootstrap?.dashboard?.upcomingDays ?? []
+            if upcoming.isEmpty {
+                SiteFlowCard {
+                    Text("No work days scheduled this week.")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(SiteFlowPalette.slate)
+                }
+            } else {
+                ForEach(upcoming) { day in
+                    WorkDayRow(day: day)
+                }
+            }
+        }
+    }
+
+    private var activeJobs: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            SiteFlowSectionHeader("In Progress")
+
+            let jobs = appModel.bootstrap?.dashboard?.activeJobs ?? []
+            if jobs.isEmpty {
+                SiteFlowCard {
+                    Text("No jobs are in progress.")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(SiteFlowPalette.slate)
+                }
+            } else {
+                ForEach(jobs) { job in
+                    JobRow(job: job, showFinancials: appModel.bootstrap?.user.permissions.canViewJobFinancials == true || appModel.bootstrap?.user.isOwner == true)
+                }
+            }
         }
     }
 }
 
-struct KPICard: View {
+private struct KpiView: View {
     let title: String
     let value: String
     let icon: String
+    let accent: Color
 
     var body: some View {
-        VStack {
-            Image(systemName: icon)
-                .font(.largeTitle)
-                .foregroundColor(.blue)
+        SiteFlowCard {
+            HStack {
+                Image(systemName: icon)
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(accent)
+                Text(title.uppercased())
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(SiteFlowPalette.slate)
+            }
+
             Text(value)
-                .font(.title)
-                .fontWeight(.bold)
-            Text(title)
-                .font(.caption)
-                .foregroundColor(.secondary)
+                .font(.system(size: 24, weight: .bold))
+                .foregroundStyle(SiteFlowPalette.ink)
         }
-        .frame(maxWidth: .infinity)
-        .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(10)
     }
 }
 
-struct JobCard: View {
+struct JobRow: View {
+    let job: JobSummary
+    let showFinancials: Bool
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text("Sample Job Name")
-                    .font(.headline)
+        let badge = statusBadge(for: job.status)
+
+        SiteFlowCard {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(job.name)
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundStyle(SiteFlowPalette.ink)
+                    if let client = job.clientName, !client.isEmpty {
+                        Text(client)
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundStyle(SiteFlowPalette.slate)
+                    }
+                    if let address = job.address, !address.isEmpty {
+                        Text(address)
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundStyle(SiteFlowPalette.slate.opacity(0.92))
+                    }
+                }
+
                 Spacer()
-                Text("In Progress")
-                    .font(.caption)
-                    .padding(4)
-                    .background(Color.blue.opacity(0.2))
-                    .cornerRadius(4)
+
+                StatusBadge(title: displayStatus(job.status), foreground: badge.0, background: badge.1)
             }
-            Text("Client: Sample Client")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-            Text("123 Sample Address")
-                .font(.caption)
-                .foregroundColor(.secondary)
-            ProgressView(value: 0.5)
-                .progressViewStyle(LinearProgressViewStyle(tint: .blue))
-            HStack {
-                Text("50% Complete")
-                    .font(.caption)
-                Spacer()
-                Text("$10,000 / $20,000")
-                    .font(.caption)
-                    .foregroundColor(.green)
+
+            VStack(alignment: .leading, spacing: 8) {
+                ProgressView(value: Double(job.percentComplete), total: 100)
+                    .tint(SiteFlowPalette.teal)
+
+                HStack {
+                    Text("\(job.percentComplete)% Complete")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(SiteFlowPalette.slate)
+
+                    Spacer()
+
+                    if showFinancials {
+                        Text("\(formatCurrency(job.amountPaid ?? 0)) / \(formatCurrency(job.totalValue ?? 0))")
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(SiteFlowPalette.teal)
+                    }
+                }
             }
         }
-        .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(10)
-        .padding(.horizontal)
     }
 }
 
-struct WorkDayCard: View {
+struct WorkDayRow: View {
+    let day: WorkDaySummary
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text("2026-04-25")
-                    .font(.headline)
+        let badge = statusBadge(for: day.status)
+
+        SiteFlowCard {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(shortDateLabel(day.date))
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(SiteFlowPalette.ink)
+                    Text(day.jobName)
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(SiteFlowPalette.slate)
+
+                    if !day.workers.isEmpty {
+                        Text(day.workers.map(\.name).joined(separator: ", "))
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundStyle(SiteFlowPalette.slate.opacity(0.95))
+                    }
+                }
+
                 Spacer()
-                Text("Planned")
-                    .font(.caption)
-                    .padding(4)
-                    .background(Color.purple.opacity(0.2))
-                    .cornerRadius(4)
+
+                StatusBadge(title: displayStatus(day.status), foreground: badge.0, background: badge.1)
             }
-            Text("Job: Sample Job")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-            Text("Crew: Worker 1, Worker 2")
-                .font(.caption)
-                .foregroundColor(.secondary)
         }
-        .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(10)
-        .padding(.horizontal)
     }
 }

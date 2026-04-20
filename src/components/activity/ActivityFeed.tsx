@@ -23,7 +23,7 @@ const ENTITY_ICONS: Record<string, React.ReactNode> = {
 
 const ENTITY_COLOR: Record<string, string> = {
   job:          'bg-blue-50 text-blue-500',
-  work_day:     'bg-orange-50 text-orange-500',
+  work_day:     'bg-teal-50 text-teal-500',
   task:         'bg-green-50 text-green-500',
   phase:        'bg-purple-50 text-purple-500',
   change_order: 'bg-yellow-50 text-yellow-600',

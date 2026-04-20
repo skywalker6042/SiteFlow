@@ -88,7 +88,7 @@ export function WorkerForm({ onSuccess, specialties, worker }: WorkerFormProps) 
                   type="checkbox"
                   checked={selectedSpecialties.has(s.id)}
                   onChange={() => toggleSpecialty(s.id)}
-                  className="w-4 h-4 rounded accent-orange-500"
+                  className="w-4 h-4 rounded accent-teal-500"
                 />
                 <span className="text-sm text-gray-700">{s.name}</span>
               </label>

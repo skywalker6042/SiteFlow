@@ -119,7 +119,7 @@ export function SessionCrewPicker({
                         className={cn(
                           'text-xs font-medium px-2.5 py-1 rounded-lg transition-colors',
                           allIn
-                            ? 'bg-orange-100 text-orange-600 hover:bg-orange-200'
+                            ? 'bg-teal-100 text-teal-600 hover:bg-teal-200'
                             : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
                           team.members.length === 0 && 'opacity-40 cursor-not-allowed'
                         )}
@@ -145,12 +145,12 @@ export function SessionCrewPicker({
                     onClick={() => toggle(worker.id)}
                     className={cn(
                       'flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors',
-                      checked ? 'bg-orange-50' : 'hover:bg-gray-50'
+                      checked ? 'bg-teal-50' : 'hover:bg-gray-50'
                     )}
                   >
                     <div className={cn(
                       'w-5 h-5 rounded flex items-center justify-center border flex-shrink-0',
-                      checked ? 'bg-orange-500 border-orange-500' : 'border-gray-300'
+                      checked ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
                     )}>
                       {checked && <Check size={11} className="text-white" />}
                     </div>
@@ -180,7 +180,7 @@ export function SessionCrewPicker({
             <button
               onClick={handleSave}
               disabled={saving}
-              className="px-4 py-1.5 text-sm bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:opacity-50 font-medium"
+              className="px-4 py-1.5 text-sm bg-teal-500 text-white rounded-lg hover:bg-teal-600 disabled:opacity-50 font-medium"
             >
               {saving ? 'Saving...' : 'Save'}
             </button>

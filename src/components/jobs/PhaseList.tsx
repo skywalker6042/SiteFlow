@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useOptimistic, useTransition } from 'react'
+import { useState, useOptimistic, useTransition, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus, ChevronUp, ChevronDown, Trash2, Check } from 'lucide-react'
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
@@ -12,15 +12,9 @@ import { calcProgress, nextStatus } from '@/lib/phases'
 import { cn, statusColor, statusLabel } from '@/lib/utils'
 import type { JobPhase } from '@/types'
 
-const statusIcon: Record<JobPhase['status'], string> = {
-  not_started: '○',
-  in_progress: '◑',
-  done: '●',
-}
-
 const statusRing: Record<JobPhase['status'], string> = {
   not_started: 'border-gray-300 text-gray-400',
-  in_progress: 'border-blue-400 text-blue-500 bg-blue-50',
+  in_progress: 'border-gray-300 text-gray-400',
   done: 'border-green-500 text-green-600 bg-green-50',
 }
 
@@ -32,6 +26,9 @@ interface PhaseListProps {
 export function PhaseList({ jobId, initialPhases }: PhaseListProps) {
   const router = useRouter()
   const [phases, setPhases] = useState<JobPhase[]>(initialPhases)
+
+  // Sync when server re-renders after router.refresh() (e.g. job marked done)
+  useEffect(() => { setPhases(initialPhases) }, [initialPhases])
   const [addOpen, setAddOpen] = useState(false)
   const [addForm, setAddForm] = useState({ name: '', notes: '' })
   const [adding, setAdding] = useState(false)
@@ -111,7 +108,7 @@ export function PhaseList({ jobId, initialPhases }: PhaseListProps) {
             </div>
             <button
               onClick={() => setAddOpen(true)}
-              className="flex items-center gap-1 text-xs text-orange-500 font-medium"
+              className="flex items-center gap-1 text-xs text-teal-500 font-medium"
             >
               <Plus size={13} />
               Add Phase
@@ -130,7 +127,7 @@ export function PhaseList({ jobId, initialPhases }: PhaseListProps) {
               <p className="text-sm text-gray-400">No phases yet</p>
               <button
                 onClick={() => setAddOpen(true)}
-                className="text-xs text-orange-500 font-medium"
+                className="text-xs text-teal-500 font-medium"
               >
                 Add your first phase
               </button>
@@ -148,7 +145,7 @@ export function PhaseList({ jobId, initialPhases }: PhaseListProps) {
                     )}
                     title={`Status: ${statusLabel(phase.status)} — tap to advance`}
                   >
-                    {phase.status === 'done' ? <Check size={13} /> : statusIcon[phase.status]}
+                    {phase.status === 'done' ? <Check size={13} /> : null}
                   </button>
 
                   {/* Phase name */}

@@ -6,7 +6,7 @@ const DEFAULTS: Record<string, string> = {
   price_trial_days: '14',
   price_core:       '39',
   price_pro:        '79',
-  price_setup:      '299',
+  price_setup:      '699',
 }
 
 export async function ensurePricingTable() {

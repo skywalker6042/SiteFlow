@@ -59,7 +59,7 @@ export function JobCard({ job, showFinancials, canEdit }: JobCardProps) {
 
   return (
     <div onClick={() => router.push(`/jobs/${job.id}`)} className="cursor-pointer">
-      <Card className="hover:border-orange-300 transition-all">
+      <Card className="hover:border-teal-300 transition-all">
         <CardBody className="flex flex-col gap-2">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">

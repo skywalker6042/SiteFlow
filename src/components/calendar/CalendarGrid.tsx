@@ -20,7 +20,7 @@ const PALETTE = [
   'bg-amber-100  text-amber-800  border-amber-200',
   'bg-emerald-100 text-emerald-800 border-emerald-200',
   'bg-indigo-100 text-indigo-800 border-indigo-200',
-  'bg-orange-100 text-orange-800 border-orange-200',
+  'bg-teal-100 text-teal-800 border-teal-200',
 ]
 
 function jobColor(jobId: string): string {
@@ -136,7 +136,7 @@ export function CalendarGrid({ initialSessions, initialYear, initialMonth }: Cal
         <select
           value={filterJob}
           onChange={(e) => setFilterJob(e.target.value)}
-          className="text-xs rounded-lg border border-gray-200 px-2.5 py-1.5 text-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white"
+          className="text-xs rounded-lg border border-gray-200 px-2.5 py-1.5 text-gray-600 focus:outline-none focus:ring-2 focus:ring-teal-400 bg-white"
         >
           <option value="">All Jobs</option>
           {allJobs.map((j) => <option key={j.id} value={j.id}>{j.name}</option>)}
@@ -145,7 +145,7 @@ export function CalendarGrid({ initialSessions, initialYear, initialMonth }: Cal
         <select
           value={filterCrew}
           onChange={(e) => setFilterCrew(e.target.value)}
-          className="text-xs rounded-lg border border-gray-200 px-2.5 py-1.5 text-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white"
+          className="text-xs rounded-lg border border-gray-200 px-2.5 py-1.5 text-gray-600 focus:outline-none focus:ring-2 focus:ring-teal-400 bg-white"
         >
           <option value="">All Crew</option>
           {allWorkers.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
@@ -154,7 +154,7 @@ export function CalendarGrid({ initialSessions, initialYear, initialMonth }: Cal
         <select
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
-          className="text-xs rounded-lg border border-gray-200 px-2.5 py-1.5 text-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white"
+          className="text-xs rounded-lg border border-gray-200 px-2.5 py-1.5 text-gray-600 focus:outline-none focus:ring-2 focus:ring-teal-400 bg-white"
         >
           <option value="">All Statuses</option>
           <option value="planned">Planned</option>
@@ -194,12 +194,12 @@ export function CalendarGrid({ initialSessions, initialYear, initialMonth }: Cal
               key={day}
               className={cn(
                 'bg-white min-h-[80px] sm:min-h-[100px] p-1 flex flex-col gap-0.5',
-                isToday(day) && 'bg-orange-50'
+                isToday(day) && 'bg-teal-50'
               )}
             >
               <span className={cn(
                 'text-xs font-semibold self-start w-5 h-5 flex items-center justify-center rounded-full mb-0.5',
-                isToday(day) ? 'bg-orange-500 text-white' : 'text-gray-500'
+                isToday(day) ? 'bg-teal-500 text-white' : 'text-gray-500'
               )}>
                 {day}
               </span>
@@ -275,7 +275,7 @@ export function CalendarGrid({ initialSessions, initialYear, initialMonth }: Cal
 
           <button
             onClick={() => router.push(`/jobs/${detailDay.job_id}`)}
-            className="mt-3 text-xs text-orange-500 font-medium hover:text-orange-600"
+            className="mt-3 text-xs text-teal-500 font-medium hover:text-teal-600"
           >
             View job →
           </button>

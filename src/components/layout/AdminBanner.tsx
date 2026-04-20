@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { AlertTriangle, X } from 'lucide-react'
 
-export function AdminBanner({ orgName }: { orgName: string }) {
+export function AdminBanner({ orgName, orgPlan }: { orgName: string; orgPlan: string }) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
 
@@ -23,7 +23,7 @@ export function AdminBanner({ orgName }: { orgName: string }) {
     <div className="bg-amber-500 text-white px-4 py-2 flex items-center justify-between gap-3 text-sm font-medium">
       <div className="flex items-center gap-2">
         <AlertTriangle size={15} className="shrink-0" />
-        <span>Admin Mode — viewing <strong>{orgName}</strong></span>
+        <span>Admin Mode — viewing <strong>{orgName}</strong> <span className="opacity-70 font-normal">(plan: {orgPlan} · all features visible)</span></span>
       </div>
       <button
         onClick={handleExit}

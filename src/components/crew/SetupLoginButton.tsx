@@ -60,7 +60,7 @@ export function SetupLoginButton({ workerId, workerName, loginEmail }: Props) {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="text-[10px] text-gray-400 hover:text-orange-500 font-medium flex items-center gap-0.5 transition-colors"
+        className="text-[10px] text-gray-400 hover:text-teal-500 font-medium flex items-center gap-0.5 transition-colors"
         title="Set up login for this crew member"
       >
         <LogIn size={10} /> Set up login
@@ -72,7 +72,7 @@ export function SetupLoginButton({ workerId, workerName, loginEmail }: Props) {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h2 className="text-sm font-bold text-gray-900">Create login for {workerName}</h2>
-                <p className="text-xs text-gray-400 mt-0.5">They'll use this to sign in to SiteFlow</p>
+                <p className="text-xs text-gray-400 mt-0.5">They'll use this to sign in to SiteFlo</p>
               </div>
               <button onClick={() => setOpen(false)} className="text-gray-400 hover:text-gray-700"><X size={16} /></button>
             </div>
@@ -81,14 +81,14 @@ export function SetupLoginButton({ workerId, workerName, loginEmail }: Props) {
                 <label className="block text-xs font-medium text-gray-600 mb-1">Email</label>
                 <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required
                   placeholder="worker@email.com"
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400" />
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">Temporary password</label>
                 <div className="relative">
                   <input type={showPw ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} required
                     placeholder="••••••••"
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 pr-9 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400" />
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 pr-9 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400" />
                   <button type="button" onClick={() => setShowPw((v) => !v)}
                     className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400">
                     {showPw ? <EyeOff size={14} /> : <Eye size={14} />}
@@ -100,7 +100,7 @@ export function SetupLoginButton({ workerId, workerName, loginEmail }: Props) {
                 <button type="button" onClick={() => setOpen(false)}
                   className="flex-1 border border-gray-200 text-gray-600 text-sm font-medium py-2 rounded-lg hover:bg-gray-50">Cancel</button>
                 <button type="submit" disabled={loading || !email || !password}
-                  className="flex-1 bg-orange-500 hover:bg-orange-600 disabled:opacity-40 text-white text-sm font-medium py-2 rounded-lg">
+                  className="flex-1 bg-teal-500 hover:bg-teal-600 disabled:opacity-40 text-white text-sm font-medium py-2 rounded-lg">
                   {loading ? 'Creating…' : 'Create login'}
                 </button>
               </div>

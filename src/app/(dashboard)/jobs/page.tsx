@@ -4,6 +4,7 @@ import { DEFAULT_WORKER_PERMISSIONS } from '@/lib/permissions'
 import { Card, CardBody } from '@/components/ui/Card'
 import { NewJobButton } from '@/components/jobs/NewJobButton'
 import { JobCard } from '@/components/jobs/JobCard'
+import { JobTabBar } from '@/components/jobs/JobTabBar'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,7 +19,11 @@ interface JobRow {
   amount_paid: number
 }
 
-export default async function JobsPage() {
+interface PageProps { searchParams: Promise<{ tab?: string }> }
+
+export default async function JobsPage({ searchParams }: PageProps) {
+  const { tab = 'in-progress' } = await searchParams
+
   const user = await getSessionUser()
   const orgId = user.effectiveOrgId!
   const isOwner = user.role === 'owner' || user.platformRole === 'admin'
@@ -39,13 +44,23 @@ export default async function JobsPage() {
     ` as unknown as JobRow[]
   }
 
-  const inProgress  = jobs.filter((j) => j.status === 'in_progress')
-  const planned     = jobs.filter((j) => j.status === 'planned')
-  const notStarted  = jobs.filter((j) => j.status === 'not_started')
-  const doneJobs    = jobs.filter((j) => j.status === 'done')
-  const canCreate   = isOwner || perms.can_edit_jobs
-  const canEdit     = isOwner || perms.can_edit_jobs
-  const showFin     = isOwner || perms.can_view_job_financials
+  const inProgress = jobs.filter((j) => j.status === 'in_progress')
+  const backlog    = jobs.filter((j) => j.status === 'not_started' || j.status === 'planned')
+  const completed  = jobs.filter((j) => j.status === 'done')
+  const canCreate  = isOwner || perms.can_edit_jobs
+  const canEdit    = isOwner || perms.can_edit_jobs
+  const showFin    = isOwner || perms.can_view_job_financials
+
+  const counts = {
+    'in-progress': inProgress.length,
+    'backlog':     backlog.length,
+    'completed':   completed.length,
+  }
+
+  const displayJobs =
+    tab === 'backlog'   ? backlog   :
+    tab === 'completed' ? completed :
+    inProgress
 
   return (
     <div className="flex flex-col gap-5">
@@ -54,52 +69,24 @@ export default async function JobsPage() {
         {canCreate && <NewJobButton />}
       </div>
 
-      {jobs.length === 0 && (
+      <JobTabBar activeTab={tab} counts={counts} />
+
+      {displayJobs.length === 0 ? (
         <Card>
           <CardBody className="py-10 text-center">
             <p className="text-gray-400 text-sm">
-              {isOwner || perms.can_view_all_jobs
-                ? 'No jobs yet. Add your first job.'
-                : "You haven't been assigned to any jobs yet."}
+              {tab === 'in-progress' && 'No jobs in progress.'}
+              {tab === 'backlog'     && 'No jobs in the backlog.'}
+              {tab === 'completed'   && 'No completed jobs yet.'}
             </p>
           </CardBody>
         </Card>
-      )}
-
-      {inProgress.length > 0 && (
-        <section>
-          <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">In Progress</h2>
-          <div className="flex flex-col gap-2">
-            {inProgress.map((job) => <JobCard key={job.id} job={job} showFinancials={showFin} canEdit={canEdit} />)}
-          </div>
-        </section>
-      )}
-
-      {planned.length > 0 && (
-        <section>
-          <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Planned</h2>
-          <div className="flex flex-col gap-2">
-            {planned.map((job) => <JobCard key={job.id} job={job} showFinancials={showFin} canEdit={canEdit} />)}
-          </div>
-        </section>
-      )}
-
-      {notStarted.length > 0 && (
-        <section>
-          <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Not Started</h2>
-          <div className="flex flex-col gap-2">
-            {notStarted.map((job) => <JobCard key={job.id} job={job} showFinancials={showFin} canEdit={canEdit} />)}
-          </div>
-        </section>
-      )}
-
-      {doneJobs.length > 0 && (
-        <section>
-          <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Completed</h2>
-          <div className="flex flex-col gap-2">
-            {doneJobs.map((job) => <JobCard key={job.id} job={job} showFinancials={showFin} canEdit={canEdit} />)}
-          </div>
-        </section>
+      ) : (
+        <div className="flex flex-col gap-2">
+          {displayJobs.map((job) => (
+            <JobCard key={job.id} job={job} showFinancials={showFin} canEdit={canEdit} />
+          ))}
+        </div>
       )}
     </div>
   )

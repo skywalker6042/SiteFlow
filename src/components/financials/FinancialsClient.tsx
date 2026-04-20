@@ -301,7 +301,7 @@ export function FinancialsClient({
               const pct = job.total_value > 0 ? Math.round((job.amount_paid / job.total_value) * 100) : 0
               return (
                 <Link key={job.id} href={`/jobs/${job.id}`}>
-                  <Card className="hover:border-orange-300 transition-all">
+                  <Card className="hover:border-teal-300 transition-all">
                     <CardBody className="flex flex-col gap-2">
                       <div className="flex items-start justify-between gap-2">
                         <div>

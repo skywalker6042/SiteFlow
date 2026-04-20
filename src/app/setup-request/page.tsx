@@ -8,8 +8,8 @@ export default function SetupRequestPage() {
       {/* Nav */}
       <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <HardHat size={20} className="text-orange-500" />
-          <span className="font-bold text-gray-900">SiteFlow</span>
+          <HardHat size={20} className="text-teal-500" />
+          <span className="font-bold text-gray-900">SiteFlo</span>
         </Link>
         <Link href="/pricing" className="text-sm text-gray-500 hover:text-gray-800 transition-colors">
           ← Back to pricing
@@ -21,12 +21,12 @@ export default function SetupRequestPage() {
         {/* Left — pitch */}
         <div className="md:col-span-2 flex flex-col gap-8">
           <div className="flex flex-col gap-3">
-            <span className="text-xs font-bold text-orange-500 uppercase tracking-widest">Done-For-You Setup</span>
+            <span className="text-xs font-bold text-teal-500 uppercase tracking-widest">Done-For-You Setup</span>
             <h1 className="text-3xl font-extrabold text-gray-900 leading-tight">
               We'll set everything up so you can hit the ground running.
             </h1>
             <p className="text-sm text-gray-500 leading-relaxed">
-              Tell us about your business and we'll handle the entire setup — workers, projects, schedule, and profile — so you can start using SiteFlow immediately.
+              Tell us about your business and we'll handle the entire setup — workers, projects, schedule, and profile — so you can start using SiteFlo immediately.
             </p>
           </div>
 
@@ -38,8 +38,8 @@ export default function SetupRequestPage() {
               { icon: Shield,  title: 'Nothing to figure out', body: 'We handle the configuration — you just log in and go.' },
             ].map(({ icon: Icon, title, body }) => (
               <div key={title} className="flex gap-3">
-                <div className="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center shrink-0 mt-0.5">
-                  <Icon size={15} className="text-orange-500" />
+                <div className="w-8 h-8 rounded-lg bg-teal-100 flex items-center justify-center shrink-0 mt-0.5">
+                  <Icon size={15} className="text-teal-500" />
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-gray-900">{title}</p>
@@ -49,7 +49,7 @@ export default function SetupRequestPage() {
             ))}
           </div>
 
-          <div className="bg-orange-50 border border-orange-100 rounded-xl p-4 text-sm text-orange-800 leading-relaxed">
+          <div className="bg-teal-50 border border-teal-100 rounded-xl p-4 text-sm text-teal-800 leading-relaxed">
             "We'll handle everything for you so you can focus on your business."
           </div>
         </div>

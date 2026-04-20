@@ -11,7 +11,7 @@ export type OrgIdentityPillProps = {
 /** Deterministic gradient from org name — same name always gets same gradient */
 function nameToGradient(name: string): { from: string; to: string; accent: string } {
   const palettes = [
-    { from: '#f97316', to: '#ea580c', accent: '#f97316' }, // orange
+    { from: '#f97316', to: '#ea580c', accent: '#f97316' }, // teal
     { from: '#8b5cf6', to: '#7c3aed', accent: '#8b5cf6' }, // violet
     { from: '#06b6d4', to: '#0891b2', accent: '#06b6d4' }, // cyan
     { from: '#10b981', to: '#059669', accent: '#10b981' }, // emerald

@@ -3,6 +3,7 @@ import sql from '@/lib/db'
 import { unauthorized, forbidden } from '@/lib/auth-context'
 import { auth } from '@/lib/auth'
 import { hashSync } from 'bcryptjs'
+import { sendWelcomeEmail } from '@/lib/email'
 
 interface Ctx { params: Promise<{ id: string }> }
 
@@ -24,7 +25,7 @@ export async function POST(req: NextRequest, { params }: Ctx) {
   }
 
   // Verify org exists
-  const [org] = await sql`SELECT id FROM organizations WHERE id = ${orgId}`
+  const [org] = await sql`SELECT id, name FROM organizations WHERE id = ${orgId}`
   if (!org) return NextResponse.json({ error: 'Org not found' }, { status: 404 })
 
   const normalizedEmail = email.toLowerCase().trim()
@@ -83,6 +84,11 @@ export async function POST(req: NextRequest, { params }: Ctx) {
       SET role = EXCLUDED.role, permissions = EXCLUDED.permissions
     RETURNING *
   `
+
+  // Send welcome email only for newly created accounts (not existing users re-added)
+  if (!existingUser && role === 'owner') {
+    sendWelcomeEmail(normalizedEmail, org.name, password)
+  }
 
   return NextResponse.json({ user: { id: user.id, email: normalizedEmail }, member }, { status: 201 })
 }

@@ -59,7 +59,7 @@ export function TicketForm({ initialName, initialEmail, initialOrg }: Props) {
         <p className="text-sm text-gray-500 max-w-xs">We'll get back to you at {email} as soon as possible.</p>
         <button
           onClick={() => setDone(false)}
-          className="mt-2 text-sm text-orange-500 hover:underline"
+          className="mt-2 text-sm text-teal-500 hover:underline"
         >
           Submit another request
         </button>
@@ -75,7 +75,7 @@ export function TicketForm({ initialName, initialEmail, initialOrg }: Props) {
             value={name}
             onChange={e => setName(e.target.value)}
             placeholder="John Smith"
-            className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:border-orange-400 bg-white"
+            className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:border-teal-400 bg-white"
           />
         </Field>
         <Field label="Email address *">
@@ -84,7 +84,7 @@ export function TicketForm({ initialName, initialEmail, initialOrg }: Props) {
             value={email}
             onChange={e => setEmail(e.target.value)}
             placeholder="john@example.com"
-            className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:border-orange-400 bg-white"
+            className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:border-teal-400 bg-white"
           />
         </Field>
       </div>
@@ -95,7 +95,7 @@ export function TicketForm({ initialName, initialEmail, initialOrg }: Props) {
             value={org}
             onChange={e => setOrg(e.target.value)}
             placeholder="Your company name"
-            className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:border-orange-400 bg-white"
+            className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:border-teal-400 bg-white"
           />
         </Field>
         <Field label="Request type">
@@ -131,7 +131,7 @@ export function TicketForm({ initialName, initialEmail, initialOrg }: Props) {
       <button
         type="submit"
         disabled={loading}
-        className="flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-semibold text-sm py-3 rounded-xl transition-colors disabled:opacity-50"
+        className="flex items-center justify-center gap-2 bg-teal-500 hover:bg-teal-600 text-white font-semibold text-sm py-3 rounded-xl transition-colors disabled:opacity-50"
       >
         <Send size={15} />
         {loading ? 'Sending…' : 'Send Request'}

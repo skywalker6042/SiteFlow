@@ -6,7 +6,7 @@ interface ProgressBarProps {
 export function ProgressBar({ value, showLabel = true }: ProgressBarProps) {
   const pct = Math.min(100, Math.max(0, value))
   const color =
-    pct === 100 ? 'bg-green-500' : pct >= 50 ? 'bg-orange-500' : 'bg-orange-400'
+    pct === 100 ? 'bg-green-500' : pct >= 50 ? 'bg-teal-500' : 'bg-teal-400'
 
   return (
     <div className="flex items-center gap-2">

@@ -53,8 +53,8 @@ export function BacklogBoard({ jobs }: { jobs: BacklogJob[] }) {
   function SortIcon({ k }: { k: SortKey }) {
     if (sortKey !== k) return <ArrowUpDown size={11} className="text-gray-300" />
     return sortDir === 'asc'
-      ? <ArrowUp size={11} className="text-orange-500" />
-      : <ArrowDown size={11} className="text-orange-500" />
+      ? <ArrowUp size={11} className="text-teal-500" />
+      : <ArrowDown size={11} className="text-teal-500" />
   }
 
   function SortBtn({ k, label }: { k: SortKey; label: string }) {
@@ -84,7 +84,7 @@ export function BacklogBoard({ jobs }: { jobs: BacklogJob[] }) {
             type="checkbox"
             checked={filterBalance}
             onChange={(e) => setFilterBalance(e.target.checked)}
-            className="accent-orange-500"
+            className="accent-teal-500"
           />
           Has balance
         </label>

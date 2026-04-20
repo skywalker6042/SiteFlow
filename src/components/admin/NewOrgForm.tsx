@@ -41,7 +41,7 @@ export function NewOrgForm() {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-1.5 bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium px-3 py-2 rounded-lg transition-colors"
+        className="flex items-center gap-1.5 bg-teal-500 hover:bg-teal-600 text-white text-sm font-medium px-3 py-2 rounded-lg transition-colors"
       >
         <Plus size={15} /> New Organization
       </button>
@@ -66,7 +66,7 @@ export function NewOrgForm() {
               onChange={(e) => setName(e.target.value)}
               placeholder="Acme Construction"
               required
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
             />
           </div>
           <div>
@@ -76,7 +76,7 @@ export function NewOrgForm() {
               value={slug}
               onChange={(e) => setSlug(e.target.value)}
               placeholder="acme-construction"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
             />
             <p className="text-xs text-gray-400 mt-1">Auto-generated from name if left blank</p>
           </div>
@@ -92,7 +92,7 @@ export function NewOrgForm() {
             <button
               type="submit"
               disabled={loading || !name.trim()}
-              className="flex-1 bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white text-sm font-medium py-2 rounded-lg transition-colors"
+              className="flex-1 bg-teal-500 hover:bg-teal-600 disabled:opacity-50 text-white text-sm font-medium py-2 rounded-lg transition-colors"
             >
               {loading ? 'Creating…' : 'Create'}
             </button>

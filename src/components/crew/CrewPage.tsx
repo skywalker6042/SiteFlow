@@ -146,7 +146,7 @@ export function CrewPage({ initialWorkers, initialTeams, specialties, roles }: C
           <h2 className="text-base font-semibold text-gray-800">Workers</h2>
           <button
             onClick={() => setAddOpen(true)}
-            className="flex items-center gap-1 text-sm text-orange-500 font-medium hover:text-orange-600"
+            className="flex items-center gap-1 text-sm text-teal-500 font-medium hover:text-teal-600"
           >
             <Plus size={15} />
             Add Worker
@@ -167,7 +167,7 @@ export function CrewPage({ initialWorkers, initialTeams, specialties, roles }: C
               return (
                 <Card key={worker.id}>
                   <CardBody className="flex items-start gap-3">
-                    <div className="w-8 h-8 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">
+                    <div className="w-8 h-8 bg-teal-100 text-teal-600 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">
                       {worker.name[0].toUpperCase()}
                     </div>
 
@@ -177,7 +177,7 @@ export function CrewPage({ initialWorkers, initialTeams, specialties, roles }: C
                       {workerSpecialties.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-1.5">
                           {workerSpecialties.map((s) => (
-                            <span key={s.id} className="text-[10px] bg-orange-50 text-orange-600 px-2 py-0.5 rounded-full font-medium">
+                            <span key={s.id} className="text-[10px] bg-teal-50 text-teal-600 px-2 py-0.5 rounded-full font-medium">
                               {s.name}
                             </span>
                           ))}
@@ -226,7 +226,7 @@ export function CrewPage({ initialWorkers, initialTeams, specialties, roles }: C
                                 <Shield size={8} /> {worker.role_name}
                               </span>
                             ) : (
-                              <span className="text-[10px] text-gray-400 hover:text-orange-500 font-medium flex items-center gap-0.5 transition-colors">
+                              <span className="text-[10px] text-gray-400 hover:text-teal-500 font-medium flex items-center gap-0.5 transition-colors">
                                 <Shield size={9} /> Assign role
                               </span>
                             )}
@@ -245,7 +245,7 @@ export function CrewPage({ initialWorkers, initialTeams, specialties, roles }: C
 
                     <div className="flex items-center gap-1 flex-shrink-0">
                       {worker.phone && (
-                        <a href={`tel:${worker.phone}`} className="text-orange-500 p-1.5 hover:bg-orange-50 rounded-lg">
+                        <a href={`tel:${worker.phone}`} className="text-teal-500 p-1.5 hover:bg-teal-50 rounded-lg">
                           <Phone size={15} />
                         </a>
                       )}
@@ -288,12 +288,12 @@ export function CrewPage({ initialWorkers, initialTeams, specialties, roles }: C
                   value={newTeamName}
                   onChange={(e) => setNewTeamName(e.target.value)}
                   placeholder="Crew name"
-                  className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                  className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
                 />
                 <button
                   type="submit"
                   disabled={addingTeam || !newTeamName.trim()}
-                  className="px-3 py-2 bg-orange-500 text-white text-sm rounded-lg hover:bg-orange-600 disabled:opacity-50 font-medium flex items-center gap-1"
+                  className="px-3 py-2 bg-teal-500 text-white text-sm rounded-lg hover:bg-teal-600 disabled:opacity-50 font-medium flex items-center gap-1"
                 >
                   <Plus size={14} />
                   Add
@@ -335,7 +335,7 @@ export function CrewPage({ initialWorkers, initialTeams, specialties, roles }: C
                         </div>
                         <button
                           onClick={() => toggleExpandTeam(team.id)}
-                          className="text-xs text-orange-500 font-medium hover:text-orange-600 px-1"
+                          className="text-xs text-teal-500 font-medium hover:text-teal-600 px-1"
                         >
                           {isExpanded ? 'Done' : 'Edit Members'}
                         </button>
@@ -358,12 +358,12 @@ export function CrewPage({ initialWorkers, initialTeams, specialties, roles }: C
                                   onClick={() => toggleTeamMember(team.id, worker.id)}
                                   className={cn(
                                     'flex items-center gap-2 px-2 py-1.5 rounded-lg text-left transition-colors',
-                                    checked ? 'bg-orange-50' : 'hover:bg-white'
+                                    checked ? 'bg-teal-50' : 'hover:bg-white'
                                   )}
                                 >
                                   <div className={cn(
                                     'w-4 h-4 rounded border flex items-center justify-center flex-shrink-0',
-                                    checked ? 'bg-orange-500 border-orange-500' : 'border-gray-300 bg-white'
+                                    checked ? 'bg-teal-500 border-teal-500' : 'border-gray-300 bg-white'
                                   )}>
                                     {checked && <Check size={9} className="text-white" />}
                                   </div>
@@ -386,7 +386,7 @@ export function CrewPage({ initialWorkers, initialTeams, specialties, roles }: C
                             <button
                               onClick={() => saveTeamMembers(team.id)}
                               disabled={savingMembers === team.id}
-                              className="flex items-center gap-1 text-xs bg-orange-500 text-white px-3 py-1.5 rounded-lg hover:bg-orange-600 disabled:opacity-50 font-medium"
+                              className="flex items-center gap-1 text-xs bg-teal-500 text-white px-3 py-1.5 rounded-lg hover:bg-teal-600 disabled:opacity-50 font-medium"
                             >
                               <Check size={12} />
                               {savingMembers === team.id ? 'Saving...' : 'Save Members'}

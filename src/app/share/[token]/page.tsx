@@ -188,18 +188,18 @@ export default async function SharePage({ params, searchParams }: PageProps) {
         {showInvoice && (
           <a
             href={`/share/${token}/invoice`}
-            className="bg-white rounded-xl border border-gray-200 p-4 flex items-center justify-between hover:border-orange-300 hover:bg-orange-50 transition-colors group"
+            className="bg-white rounded-xl border border-gray-200 p-4 flex items-center justify-between hover:border-teal-300 hover:bg-teal-50 transition-colors group"
           >
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-orange-100 flex items-center justify-center shrink-0">
-                <FileText size={16} className="text-orange-500" />
+              <div className="w-9 h-9 rounded-lg bg-teal-100 flex items-center justify-center shrink-0">
+                <FileText size={16} className="text-teal-500" />
               </div>
               <div>
                 <p className="text-sm font-semibold text-gray-900">View Invoice</p>
                 <p className="text-xs text-gray-400 mt-0.5">Tap to open your invoice</p>
               </div>
             </div>
-            <ArrowRight size={16} className="text-gray-300 group-hover:text-orange-400 transition-colors" />
+            <ArrowRight size={16} className="text-gray-300 group-hover:text-teal-400 transition-colors" />
           </a>
         )}
 
@@ -213,13 +213,13 @@ export default async function SharePage({ params, searchParams }: PageProps) {
         {job.org_phone && (
           <div className="bg-white rounded-xl border border-gray-200 p-4 flex items-center justify-between">
             <span className="text-sm text-gray-700 font-medium">{job.org_name}</span>
-            <a href={`tel:${job.org_phone}`} className="flex items-center gap-1.5 text-sm text-orange-500 font-medium">
+            <a href={`tel:${job.org_phone}`} className="flex items-center gap-1.5 text-sm text-teal-500 font-medium">
               <Phone size={14} /> {job.org_phone}
             </a>
           </div>
         )}
 
-        <p className="text-xs text-gray-300 text-center">Powered by SiteFlow</p>
+        <p className="text-xs text-gray-300 text-center">Powered by SiteFlo</p>
       </div>
     </div>
   )

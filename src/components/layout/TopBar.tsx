@@ -24,12 +24,16 @@ interface TopBarProps {
 export function TopBar({ orgName, orgLogo }: TopBarProps) {
   const pathname = usePathname()
   const isHome   = pathname === '/dashboard'
-  const title    = Object.entries(titles).find(([key]) => pathname.startsWith(key))?.[1] ?? 'SiteFlow'
+  const title    = Object.entries(titles).find(([key]) => pathname.startsWith(key))?.[1] ?? 'SiteFlo'
 
   return (
     <header className="sm:hidden sticky top-0 z-30 bg-gray-900 border-b border-gray-800 px-4 h-14 flex items-center justify-between">
       {isHome ? (
-        <OrgIdentityPill name={orgName} logoUrl={orgLogo} subtitle="General Contractor" size="sm" />
+        <div className="flex items-center gap-2">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo-512.png" alt="SiteFlo" width={24} height={17} />
+          <OrgIdentityPill name={orgName} logoUrl={orgLogo} subtitle="General Contractor" size="sm" />
+        </div>
       ) : (
         <div className="flex items-center gap-2.5">
           <OrgIdentityPill name={orgName} logoUrl={orgLogo} size="sm" subtitle="" />

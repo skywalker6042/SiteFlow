@@ -62,7 +62,7 @@ export function WorkDayCard({ id, jobId, jobName, dateLabel, crew, initialStatus
 
   return (
     <div onClick={() => router.push(`/jobs/${jobId}`)} className="cursor-pointer">
-      <Card className="hover:border-orange-300 transition-all">
+      <Card className="hover:border-teal-300 transition-all">
         <CardBody className="flex items-center justify-between gap-3 py-3">
           <div className="min-w-0">
             <p className="text-sm font-semibold text-gray-900 truncate">{jobName}</p>
@@ -71,7 +71,7 @@ export function WorkDayCard({ id, jobId, jobName, dateLabel, crew, initialStatus
             </p>
           </div>
           <div className="flex flex-col items-end gap-1 shrink-0">
-            <p className="text-xs font-semibold text-orange-500">{dateLabel}</p>
+            <p className="text-xs font-semibold text-teal-500">{dateLabel}</p>
             <div className="relative">
               <button
                 onClick={toggleMenu}

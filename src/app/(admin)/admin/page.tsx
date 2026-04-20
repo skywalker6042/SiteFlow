@@ -2,11 +2,13 @@ import sql from '@/lib/db'
 import { Building2 } from 'lucide-react'
 import { NewOrgForm } from '@/components/admin/NewOrgForm'
 import { OrgTable } from '@/components/admin/OrgTable'
+import { getAdminCaps } from '@/lib/admin-caps'
 
 export const dynamic = 'force-dynamic'
 
 export default async function AdminPage() {
-  // Idempotent migrations
+  const { can } = await getAdminCaps()
+
   await sql`
     ALTER TABLE organizations
     ADD COLUMN IF NOT EXISTS status          TEXT NOT NULL DEFAULT 'trial',
@@ -14,11 +16,12 @@ export default async function AdminPage() {
     ADD COLUMN IF NOT EXISTS paid_until      TIMESTAMPTZ
   `
   await sql`ALTER TABLE organizations ADD COLUMN IF NOT EXISTS trial_ends_at TIMESTAMPTZ`
+  await sql`ALTER TABLE organizations ADD COLUMN IF NOT EXISTS plan TEXT NOT NULL DEFAULT 'trial'`
 
   const orgs = await sql`
     SELECT
       o.id, o.name, o.slug, o.created_at,
-      o.status, o.billing_status, o.paid_until, o.trial_ends_at,
+      o.status, o.billing_status, o.paid_until, o.trial_ends_at, o.plan,
       COUNT(DISTINCT om.id) FILTER (WHERE om.id IS NOT NULL) AS member_count,
       COUNT(DISTINCT j.id)  FILTER (WHERE j.id  IS NOT NULL) AS job_count,
       MAX(al.created_at) AS last_activity
@@ -39,16 +42,14 @@ export default async function AdminPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-gray-900">Organizations</h1>
           <p className="text-sm text-gray-400 mt-0.5">{counts.total} total</p>
         </div>
-        <NewOrgForm />
+        {can('create_orgs') && <NewOrgForm />}
       </div>
 
-      {/* Summary pills */}
       <div className="flex gap-3 flex-wrap">
         <Pill label="Active"    count={counts.active}    color="green" />
         <Pill label="Trial"     count={counts.trial}     color="yellow" />
@@ -61,7 +62,12 @@ export default async function AdminPage() {
           <p className="text-gray-400 text-sm">No organizations yet.</p>
         </div>
       ) : (
-        <OrgTable orgs={orgs as any} />
+        <OrgTable
+          orgs={orgs as any}
+          canManageStatus={can('manage_org_status')}
+          canManagePlan={can('manage_org_plan')}
+          canManageBilling={can('manage_org_billing')}
+        />
       )}
     </div>
   )

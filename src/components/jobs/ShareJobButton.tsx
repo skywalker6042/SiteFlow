@@ -6,7 +6,7 @@ import { Modal } from '@/components/ui/Modal'
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? ''
 
-export function ShareJobButton({ jobId, initialToken }: { jobId: string; initialToken: string | null }) {
+export function ShareJobButton({ jobId, initialToken, allowInvoice = true }: { jobId: string; initialToken: string | null; allowInvoice?: boolean }) {
   const [token, setToken]         = useState<string | null>(initialToken)
   const [copied, setCopied]       = useState(false)
   const [loading, setLoading]     = useState(false)
@@ -54,8 +54,8 @@ export function ShareJobButton({ jobId, initialToken }: { jobId: string; initial
         disabled={loading}
         className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50 ${
           token
-            ? 'text-orange-600 border border-orange-200 hover:border-orange-400 bg-orange-50'
-            : 'text-gray-500 hover:text-orange-500 border border-gray-200 hover:border-orange-300'
+            ? 'text-teal-600 border border-teal-200 hover:border-teal-400 bg-teal-50'
+            : 'text-gray-500 hover:text-teal-500 border border-gray-200 hover:border-teal-300'
         }`}
       >
         <Link2 size={14} />
@@ -66,19 +66,21 @@ export function ShareJobButton({ jobId, initialToken }: { jobId: string; initial
         <div className="flex flex-col gap-4">
           <p className="text-sm text-gray-500">Anyone with this link can view job progress. No login required.</p>
 
-          {/* Invoice toggle */}
-          <label className="flex items-center gap-2.5 cursor-pointer select-none">
-            <div
-              onClick={() => setWithInvoice(v => !v)}
-              className={`w-9 h-5 rounded-full transition-colors relative ${withInvoice ? 'bg-orange-500' : 'bg-gray-200'}`}
-            >
-              <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${withInvoice ? 'translate-x-4' : ''}`} />
-            </div>
-            <span className="flex items-center gap-1.5 text-sm text-gray-700">
-              <FileText size={13} className="text-gray-400" />
-              Include invoice
-            </span>
-          </label>
+          {/* Invoice toggle — only shown when invoices feature is enabled */}
+          {allowInvoice && (
+            <label className="flex items-center gap-2.5 cursor-pointer select-none">
+              <div
+                onClick={() => setWithInvoice(v => !v)}
+                className={`w-9 h-5 rounded-full transition-colors relative ${withInvoice ? 'bg-teal-500' : 'bg-gray-200'}`}
+              >
+                <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${withInvoice ? 'translate-x-4' : ''}`} />
+              </div>
+              <span className="flex items-center gap-1.5 text-sm text-gray-700">
+                <FileText size={13} className="text-gray-400" />
+                Include invoice
+              </span>
+            </label>
+          )}
 
           <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
             <span className="text-xs text-gray-600 flex-1 truncate">{activeUrl}</span>
@@ -89,7 +91,7 @@ export function ShareJobButton({ jobId, initialToken }: { jobId: string; initial
           <div className="flex gap-2">
             <button
               onClick={copy}
-              className="flex-1 flex items-center justify-center gap-1.5 text-sm font-medium bg-orange-500 hover:bg-orange-600 text-white py-2.5 rounded-lg transition-colors"
+              className="flex-1 flex items-center justify-center gap-1.5 text-sm font-medium bg-teal-500 hover:bg-teal-600 text-white py-2.5 rounded-lg transition-colors"
             >
               {copied ? <><Check size={13} /> Copied!</> : <><Copy size={13} /> Copy link</>}
             </button>

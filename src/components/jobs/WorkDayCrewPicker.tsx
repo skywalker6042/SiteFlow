@@ -100,7 +100,7 @@ export function WorkDayCrewPicker({
                         disabled={team.members.length === 0}
                         className={cn(
                           'text-xs font-medium px-2.5 py-1 rounded-lg transition-colors',
-                          allIn ? 'bg-orange-100 text-orange-600 hover:bg-orange-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
+                          allIn ? 'bg-teal-100 text-teal-600 hover:bg-teal-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
                           team.members.length === 0 && 'opacity-40 cursor-not-allowed'
                         )}
                       >
@@ -121,7 +121,7 @@ export function WorkDayCrewPicker({
                 return (
                   <div key={worker.id} className={cn(
                     'rounded-lg transition-colors',
-                    checked ? 'bg-orange-50' : 'hover:bg-gray-50'
+                    checked ? 'bg-teal-50' : 'hover:bg-gray-50'
                   )}>
                     <div className="flex items-center gap-3 px-3 py-2">
                       <button
@@ -130,7 +130,7 @@ export function WorkDayCrewPicker({
                       >
                         <div className={cn(
                           'w-5 h-5 rounded border flex items-center justify-center flex-shrink-0',
-                          checked ? 'bg-orange-500 border-orange-500' : 'border-gray-300'
+                          checked ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
                         )}>
                           {checked && <Check size={11} className="text-white" />}
                         </div>
@@ -155,7 +155,7 @@ export function WorkDayCrewPicker({
                           step="0.5"
                           value={hours[worker.id] ?? '8'}
                           onChange={(e) => setHours((prev) => ({ ...prev, [worker.id]: e.target.value }))}
-                          className="w-20 border border-gray-200 rounded-lg px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-orange-400 text-center"
+                          className="w-20 border border-gray-200 rounded-lg px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-teal-400 text-center"
                         />
                         {worker.hourly_rate && (
                           <span className="text-xs text-gray-400">
@@ -183,7 +183,7 @@ export function WorkDayCrewPicker({
             <button
               onClick={handleSave}
               disabled={saving}
-              className="px-4 py-1.5 text-sm bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:opacity-50 font-medium"
+              className="px-4 py-1.5 text-sm bg-teal-500 text-white rounded-lg hover:bg-teal-600 disabled:opacity-50 font-medium"
             >
               {saving ? 'Saving...' : 'Save'}
             </button>

@@ -108,7 +108,7 @@ export function SessionList({ jobId, initialSessions, allWorkers, teams }: Sessi
             </div>
             <button
               onClick={() => setShowAddForm((v) => !v)}
-              className="flex items-center gap-1 text-xs text-orange-500 font-medium"
+              className="flex items-center gap-1 text-xs text-teal-500 font-medium"
             >
               <Plus size={13} />
               Add Day
@@ -123,12 +123,12 @@ export function SessionList({ jobId, initialSessions, allWorkers, teams }: Sessi
                   value={newDate}
                   onChange={(e) => setNewDate(e.target.value)}
                   required
-                  className="flex-1 rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                  className="flex-1 rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
                 />
                 <button
                   type="submit"
                   disabled={adding || !newDate}
-                  className="px-3 py-1.5 bg-orange-500 text-white text-sm rounded-lg hover:bg-orange-600 disabled:opacity-50 font-medium"
+                  className="px-3 py-1.5 bg-teal-500 text-white text-sm rounded-lg hover:bg-teal-600 disabled:opacity-50 font-medium"
                 >
                   {adding ? '...' : 'Add'}
                 </button>
@@ -145,7 +145,7 @@ export function SessionList({ jobId, initialSessions, allWorkers, teams }: Sessi
                 value={newNotes}
                 onChange={(e) => setNewNotes(e.target.value)}
                 placeholder="Notes (optional)"
-                className="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                className="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
               />
             </form>
           )}
@@ -157,7 +157,7 @@ export function SessionList({ jobId, initialSessions, allWorkers, teams }: Sessi
               <p className="text-sm text-gray-400 mb-2">No work sessions scheduled</p>
               <button
                 onClick={() => setShowAddForm(true)}
-                className="text-xs text-orange-500 font-medium"
+                className="text-xs text-teal-500 font-medium"
               >
                 Schedule the first day
               </button>
@@ -201,7 +201,7 @@ export function SessionList({ jobId, initialSessions, allWorkers, teams }: Sessi
                       ))}
                       <button
                         onClick={() => setCrewSession(session)}
-                        className="flex items-center gap-0.5 text-[10px] text-orange-500 font-medium hover:text-orange-600"
+                        className="flex items-center gap-0.5 text-[10px] text-teal-500 font-medium hover:text-teal-600"
                       >
                         <Users size={10} />
                         {session.workers.length === 0 ? 'Assign crew' : 'Edit'}

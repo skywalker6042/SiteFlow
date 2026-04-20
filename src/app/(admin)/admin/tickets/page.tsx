@@ -130,7 +130,7 @@ export default async function AdminTicketsPage({ searchParams }: PageProps) {
                 <tr key={t.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-4 py-3">
                     <Link href={`/admin/tickets/${t.id}`} className="flex flex-col gap-0.5">
-                      <span className="font-medium text-gray-900 hover:text-orange-500 transition-colors">{t.subject}</span>
+                      <span className="font-medium text-gray-900 hover:text-teal-500 transition-colors">{t.subject}</span>
                       <span className="text-xs text-gray-400">{t.name} · {t.email}</span>
                     </Link>
                   </td>

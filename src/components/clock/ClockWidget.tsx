@@ -91,7 +91,7 @@ export function ClockWidget({ initialOpen, myLogs: initialLogs, jobs, trackJob }
               <p className="text-3xl font-bold text-gray-900 tabular-nums">{elapsed || '…'}</p>
               <p className="text-sm text-gray-500 mt-1">
                 Clocked in at {formatTime(open.clock_in)}
-                {open.job_name && <span className="text-orange-500"> · {open.job_name}</span>}
+                {open.job_name && <span className="text-teal-500"> · {open.job_name}</span>}
               </p>
             </div>
           ) : (

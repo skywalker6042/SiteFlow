@@ -101,7 +101,7 @@ export function SignaturePad({ jobId, token, invoiceType = 'contract', onSigned 
         value={name}
         onChange={e => setName(e.target.value)}
         placeholder="Full name (optional)"
-        className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:border-orange-400"
+        className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:border-teal-400"
       />
       <div className="relative border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 overflow-hidden">
         <canvas

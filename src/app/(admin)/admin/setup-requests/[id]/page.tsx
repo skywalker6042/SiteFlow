@@ -59,7 +59,7 @@ export default async function AdminSetupRequestDetailPage({ params }: PageProps)
           <div className="bg-white rounded-xl border border-gray-200 p-5 flex flex-col gap-3 text-sm">
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Contact</p>
             <p className="font-medium text-gray-900">{String(req.contact_name)}</p>
-            <a href={`mailto:${req.email}`} className="text-orange-500 hover:underline text-sm">{String(req.email)}</a>
+            <a href={`mailto:${req.email}`} className="text-teal-500 hover:underline text-sm">{String(req.email)}</a>
             {req.phone && <p className="text-gray-500">{String(req.phone)}</p>}
           </div>
 

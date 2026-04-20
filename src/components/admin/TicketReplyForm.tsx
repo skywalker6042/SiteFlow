@@ -29,7 +29,7 @@ export function TicketReplyForm({ ticketId }: { ticketId: string }) {
         onChange={e => setMessage(e.target.value)}
         rows={4}
         placeholder="Type your reply…"
-        className="w-full text-sm border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-orange-400 resize-none"
+        className="w-full text-sm border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-teal-400 resize-none"
       />
       <button
         onClick={send}

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { CheckCircle, ArrowRight } from 'lucide-react'
 
-const inp = 'w-full text-sm border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-orange-400 bg-white placeholder:text-gray-400'
+const inp = 'w-full text-sm border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-teal-400 bg-white placeholder:text-gray-400'
 
 export function GetStartedForm() {
   const [name,    setName]    = useState('')
@@ -69,7 +69,7 @@ export function GetStartedForm() {
       <button
         type="submit"
         disabled={loading}
-        className="flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm py-3.5 rounded-xl transition-colors disabled:opacity-50 shadow-lg shadow-orange-200 mt-1"
+        className="flex items-center justify-center gap-2 bg-teal-500 hover:bg-teal-600 text-white font-bold text-sm py-3.5 rounded-xl transition-colors disabled:opacity-50 shadow-lg shadow-teal-200 mt-1"
       >
         {loading ? 'Submitting…' : <><span>Request Access</span><ArrowRight size={15} /></>}
       </button>

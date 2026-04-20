@@ -1,5 +1,5 @@
 import sql from '@/lib/db'
-import { getSessionUser } from '@/lib/auth-context'
+import { getSessionUser, getEnabledFeatures } from '@/lib/auth-context'
 import { DEFAULT_WORKER_PERMISSIONS } from '@/lib/permissions'
 import { notFound } from 'next/navigation'
 import type { Job, ChangeOrder, JobPhoto, JobPhase, JobTask, WorkerWithSpecialties, WorkDayWithCrew, TeamWithMembers } from '@/types'
@@ -27,7 +27,8 @@ export default async function JobDetailPage({ params }: PageProps) {
   const { id } = await params
   if (!id) notFound()
 
-  const user = await getSessionUser()
+  const [user, enabledFeatures] = await Promise.all([getSessionUser(), getEnabledFeatures()])
+  const has = (f: import('@/lib/plan-features').FeatureKey) => enabledFeatures.includes(f)
   const orgId = user.effectiveOrgId!
   const isOwner = user.role === 'owner' || user.platformRole === 'admin'
   const perms = { ...DEFAULT_WORKER_PERMISSIONS, ...user.permissions }
@@ -112,7 +113,7 @@ export default async function JobDetailPage({ params }: PageProps) {
   const teams      = teamRows          as unknown as TeamWithMembers[]
   const jobLogs    = activityLogs      as unknown as any[]
 
-  const progress = calcOverallProgress(jobTasks, jobPhases, Number(job.percent_complete))
+  const progress = calcOverallProgress(jobTasks, jobPhases, Number(job.percent_complete), job.status)
   const outstanding = Number(job.total_value) - Number(job.amount_paid)
   const changeOrderTotal = orders.filter((co) => co.approved).reduce((acc, co) => acc + Number(co.amount), 0)
 
@@ -131,9 +132,9 @@ export default async function JobDetailPage({ params }: PageProps) {
           </div>
           {canEditJob && <JobActions job={job} />}
         </div>
-        {isOwner && (
+        {isOwner && has('share_page') && (
           <div className="flex items-center gap-2 flex-wrap">
-            <ShareJobButton jobId={job.id} initialToken={(job as any).share_token ?? null} />
+            <ShareJobButton jobId={job.id} initialToken={(job as any).share_token ?? null} allowInvoice={has('invoices')} />
           </div>
         )}
       </div>
@@ -217,7 +218,7 @@ export default async function JobDetailPage({ params }: PageProps) {
           <CardBody className="flex flex-col gap-1">
             {job.client_name && <p className="text-sm font-medium text-gray-900">{job.client_name}</p>}
             {job.client_phone && (
-              <a href={`tel:${job.client_phone}`} className="flex items-center gap-1.5 text-sm text-orange-500">
+              <a href={`tel:${job.client_phone}`} className="flex items-center gap-1.5 text-sm text-teal-500">
                 <Phone size={13} /> {job.client_phone}
               </a>
             )}
@@ -234,7 +235,7 @@ export default async function JobDetailPage({ params }: PageProps) {
       )}
 
       {/* Change Orders */}
-      {canViewChangeOrders && (
+      {canViewChangeOrders && has('change_orders') && (
         <ChangeOrderList
           jobId={job.id}
           changeOrders={orders}
@@ -242,7 +243,9 @@ export default async function JobDetailPage({ params }: PageProps) {
         />
       )}
 
-      <PhotoGrid jobId={job.id} photos={jobPhotos} canUpload={isOwner || perms.can_upload_photos} />
+      {has('photos') && (
+        <PhotoGrid jobId={job.id} photos={jobPhotos} canUpload={isOwner || perms.can_upload_photos} />
+      )}
 
       {/* Activity */}
       {canViewActivity && jobLogs.length > 0 && (

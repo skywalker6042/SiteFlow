@@ -117,10 +117,10 @@ export default async function SettingsPage() {
 
       <Card>
         <CardHeader>
-          <span className="text-sm font-semibold text-gray-700">About SiteFlow</span>
+          <span className="text-sm font-semibold text-gray-700">About SiteFlo</span>
         </CardHeader>
         <CardBody className="flex flex-col gap-3 text-sm text-gray-600">
-          <p>SiteFlow is a simple job management tool for contractors.</p>
+          <p>SiteFlo is a simple job management tool for contractors.</p>
           <div className="border-t border-gray-100 pt-3 text-xs text-gray-400">Version 1.0.0 MVP</div>
         </CardBody>
       </Card>

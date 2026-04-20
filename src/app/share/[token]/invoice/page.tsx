@@ -17,7 +17,7 @@ function InvoiceHeader({ orgLogo, orgName, orgPhone, title, date }: {
         {orgLogo ? (
           <img src={orgLogo} alt={orgName} className="h-12 w-12 object-contain rounded-lg mb-3" />
         ) : (
-          <div className="h-12 w-12 rounded-lg bg-orange-500 flex items-center justify-center mb-3">
+          <div className="h-12 w-12 rounded-lg bg-teal-500 flex items-center justify-center mb-3">
             <span className="text-white font-bold text-lg">{orgName.slice(0, 2).toUpperCase()}</span>
           </div>
         )}
@@ -207,7 +207,7 @@ export default async function InvoicePage({ params }: PageProps) {
 
         <div className="px-8 py-5 bg-gray-50 rounded-b-2xl print:rounded-none border-t border-gray-100 flex items-center justify-between">
           <p className="text-xs text-gray-400">Thank you for your business.</p>
-          <p className="text-xs text-gray-300">Powered by SiteFlow</p>
+          <p className="text-xs text-gray-300">Powered by SiteFlo</p>
         </div>
       </div>
 
@@ -252,7 +252,7 @@ export default async function InvoicePage({ params }: PageProps) {
 
           <div className="px-8 py-5 bg-gray-50 rounded-b-2xl print:rounded-none border-t border-gray-100 flex items-center justify-between">
             <p className="text-xs text-gray-400">Thank you for your business.</p>
-            <p className="text-xs text-gray-300">Powered by SiteFlow</p>
+            <p className="text-xs text-gray-300">Powered by SiteFlo</p>
           </div>
         </div>
       )}

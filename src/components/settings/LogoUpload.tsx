@@ -49,7 +49,7 @@ export function LogoUpload({ initialLogoUrl }: { initialLogoUrl: string | null }
 
       {/* Preview */}
       <div
-        className="w-20 h-20 rounded-xl border-2 border-dashed border-gray-200 flex items-center justify-center bg-gray-50 overflow-hidden cursor-pointer hover:border-orange-300 transition-colors shrink-0"
+        className="w-20 h-20 rounded-xl border-2 border-dashed border-gray-200 flex items-center justify-center bg-gray-50 overflow-hidden cursor-pointer hover:border-teal-300 transition-colors shrink-0"
         onClick={() => !uploading && inputRef.current?.click()}
       >
         {logoUrl ? (
@@ -69,7 +69,7 @@ export function LogoUpload({ initialLogoUrl }: { initialLogoUrl: string | null }
           <button
             onClick={() => inputRef.current?.click()}
             disabled={uploading}
-            className="text-xs font-medium text-orange-500 hover:text-orange-600 border border-orange-200 hover:border-orange-300 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
+            className="text-xs font-medium text-teal-500 hover:text-teal-600 border border-teal-200 hover:border-teal-300 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
           >
             {uploading ? 'Uploading…' : logoUrl ? 'Replace' : 'Upload logo'}
           </button>

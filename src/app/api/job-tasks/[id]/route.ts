@@ -28,6 +28,21 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   `
   await syncJobProgress(current.job_id, user.effectiveOrgId!)
 
+  // Auto-complete phase when all its tasks are done
+  if (body.status === 'done' && task.phase_id) {
+    const phaseTasks = await sql`
+      SELECT status FROM job_tasks
+      WHERE phase_id = ${task.phase_id} AND company_id = ${user.effectiveOrgId}
+    `
+    if (phaseTasks.length > 0 && phaseTasks.every((t) => t.status === 'done')) {
+      await sql`
+        UPDATE job_phases SET status = 'done'
+        WHERE id = ${task.phase_id} AND company_id = ${user.effectiveOrgId}
+      `
+      await syncJobProgress(current.job_id, user.effectiveOrgId!)
+    }
+  }
+
   if (body.status && current.status !== body.status) {
     const [job] = await sql`SELECT name FROM jobs WHERE id = ${current.job_id}`
     await logActivity({

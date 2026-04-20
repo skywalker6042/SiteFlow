@@ -1,14 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { signIn } from 'next-auth/react'
+import { signIn, getSession } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Eye, EyeOff, Loader } from 'lucide-react'
 
 export function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard'
+  const callbackUrl = searchParams.get('callbackUrl') ?? '/dashboard'
 
   const [email, setEmail]       = useState('')
   const [password, setPassword] = useState('')
@@ -33,7 +33,12 @@ export function LoginForm() {
       return
     }
 
-    router.push(callbackUrl)
+    const session = await getSession()
+    const role = (session?.user as { platformRole?: string } | undefined)?.platformRole
+    const dest = callbackUrl !== '/dashboard'
+      ? callbackUrl
+      : (role === 'admin' || role === 'support' ? '/admin' : '/dashboard')
+    router.push(dest)
     router.refresh()
   }
 
@@ -55,7 +60,7 @@ export function LoginForm() {
           required
           autoComplete="email"
           placeholder="you@example.com"
-          className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+          className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
         />
       </div>
 
@@ -70,7 +75,7 @@ export function LoginForm() {
             required
             autoComplete="current-password"
             placeholder="••••••••"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2.5 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2.5 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
           />
           <button
             type="button"
@@ -85,7 +90,7 @@ export function LoginForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg text-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2 mt-1"
+        className="w-full py-2.5 bg-teal-500 hover:bg-teal-600 text-white font-semibold rounded-lg text-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2 mt-1"
       >
         {loading ? (
           <><Loader size={15} className="animate-spin" /> Signing in...</>

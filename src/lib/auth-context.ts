@@ -2,6 +2,7 @@ import { auth } from '@/lib/auth'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import type { UserPermissions } from '@/lib/permissions'
+import { ALL_FEATURES, DEFAULT_PLAN_FEATURES, type FeatureKey, type PlanTier } from '@/lib/plan-features'
 
 export const ACTIVE_ORG_COOKIE = 'siteflow_active_org'
 
@@ -98,6 +99,40 @@ export async function getAdminOrgContext(): Promise<{ orgId: string; orgName: st
   if (!org) return null
 
   return { orgId: org.id, orgName: org.name }
+}
+
+/**
+ * Returns the enabled features for the current user's org.
+ * Platform admins always get ALL_FEATURES.
+ * Falls back to DEFAULT_PLAN_FEATURES if nothing is configured in the DB.
+ */
+export async function getEnabledFeatures(): Promise<FeatureKey[]> {
+  const session = await auth()
+  if (!session?.user) return ALL_FEATURES
+
+  // Admins in org context always see everything
+  if (session.user.platformRole === 'admin') return ALL_FEATURES
+
+  const orgId = session.user.orgId
+  if (!orgId) return ALL_FEATURES
+
+  const { default: sql } = await import('@/lib/db')
+  try {
+    const [org] = await sql`SELECT plan FROM organizations WHERE id = ${orgId}` as any[]
+    const plan = ((org?.plan ?? 'trial') as PlanTier)
+    await sql`
+      CREATE TABLE IF NOT EXISTS platform_settings (
+        key        TEXT PRIMARY KEY,
+        value      TEXT NOT NULL,
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `
+    const [row] = await sql`SELECT value FROM platform_settings WHERE key = ${'plan_features_' + plan}` as any[]
+    if (row?.value) return JSON.parse(row.value) as FeatureKey[]
+    return DEFAULT_PLAN_FEATURES[plan]
+  } catch {
+    return ALL_FEATURES
+  }
 }
 
 // ─── API response helpers ─────────────────────────────────────────────────────

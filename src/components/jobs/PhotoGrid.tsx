@@ -59,7 +59,7 @@ export function PhotoGrid({ jobId, photos: initialPhotos, canUpload = true }: { 
             <button
               onClick={() => inputRef.current?.click()}
               disabled={uploading}
-              className="flex items-center gap-1 text-xs text-orange-500 font-medium disabled:opacity-50"
+              className="flex items-center gap-1 text-xs text-teal-500 font-medium disabled:opacity-50"
             >
               {uploading ? <Loader size={13} className="animate-spin" /> : <Camera size={13} />}
               {uploading ? 'Uploading...' : 'Add Photo'}
@@ -76,7 +76,7 @@ export function PhotoGrid({ jobId, photos: initialPhotos, canUpload = true }: { 
           canUpload ? (
             <button
               onClick={() => inputRef.current?.click()}
-              className="w-full py-8 border-2 border-dashed border-gray-200 rounded-lg text-center text-sm text-gray-400 hover:border-orange-300 hover:text-orange-400 transition-colors"
+              className="w-full py-8 border-2 border-dashed border-gray-200 rounded-lg text-center text-sm text-gray-400 hover:border-teal-300 hover:text-teal-400 transition-colors"
             >
               <Camera size={20} className="mx-auto mb-1" />
               Tap to add photos

@@ -67,7 +67,7 @@ export default async function AdminSetupRequestsPage() {
                 <tr key={r.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-4 py-3">
                     <Link href={`/admin/setup-requests/${r.id}`} className="flex flex-col gap-0.5">
-                      <span className="font-medium text-gray-900 hover:text-orange-500 transition-colors">{r.organization_name}</span>
+                      <span className="font-medium text-gray-900 hover:text-teal-500 transition-colors">{r.organization_name}</span>
                       <span className="text-xs text-gray-400">{r.email}</span>
                     </Link>
                   </td>

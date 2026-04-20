@@ -54,10 +54,10 @@ export default async function AdminTicketDetailPage({ params }: PageProps) {
           {(replies as any[]).length > 0 && (
             <div className="flex flex-col gap-3">
               {(replies as any[]).map(r => (
-                <div key={r.id} className={`rounded-xl border p-4 ${r.sender === 'admin' ? 'bg-orange-50 border-orange-100 ml-6' : 'bg-white border-gray-200'}`}>
+                <div key={r.id} className={`rounded-xl border p-4 ${r.sender === 'admin' ? 'bg-teal-50 border-teal-100 ml-6' : 'bg-white border-gray-200'}`}>
                   <div className="flex items-center justify-between mb-2">
-                    <span className={`text-xs font-semibold ${r.sender === 'admin' ? 'text-orange-600' : 'text-gray-500'}`}>
-                      {r.sender === 'admin' ? 'SiteFlow Support' : ticket.name}
+                    <span className={`text-xs font-semibold ${r.sender === 'admin' ? 'text-teal-600' : 'text-gray-500'}`}>
+                      {r.sender === 'admin' ? 'SiteFlo Support' : ticket.name}
                     </span>
                     <span className="text-xs text-gray-400">
                       {new Date(r.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}

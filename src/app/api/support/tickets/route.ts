@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import sql from '@/lib/db'
+import { sendAdminAlert } from '@/lib/email'
 
 async function ensureTables() {
   await sql`
@@ -48,6 +49,17 @@ export async function POST(req: NextRequest) {
     VALUES (${orgId}, ${userId}, ${name}, ${email}, ${org_name ?? null}, ${type ?? 'general'}, ${subject}, ${message})
     RETURNING id, subject, type, status, priority, created_at
   `
+  sendAdminAlert(
+    `New Support Ticket — ${subject}`,
+    '🎫',
+    `<table width="100%" cellpadding="0" cellspacing="0" style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;margin:16px 0;">
+      <tr><td style="padding:8px 12px;font-size:13px;color:#6b7280;border-bottom:1px solid #f3f4f6;">From</td><td style="padding:8px 12px;font-size:13px;font-weight:600;color:#111827;border-bottom:1px solid #f3f4f6;">${name} &lt;${email}&gt;</td></tr>
+      <tr><td style="padding:8px 12px;font-size:13px;color:#6b7280;border-bottom:1px solid #f3f4f6;">Org</td><td style="padding:8px 12px;font-size:13px;font-weight:600;color:#111827;border-bottom:1px solid #f3f4f6;">${org_name ?? 'N/A'}</td></tr>
+      <tr><td style="padding:8px 12px;font-size:13px;color:#6b7280;border-bottom:1px solid #f3f4f6;">Type</td><td style="padding:8px 12px;font-size:13px;font-weight:600;color:#111827;border-bottom:1px solid #f3f4f6;">${type ?? 'general'}</td></tr>
+      <tr><td style="padding:8px 12px;font-size:13px;color:#6b7280;">Message</td><td style="padding:8px 12px;font-size:13px;color:#111827;">${message.replace(/\n/g, '<br>')}</td></tr>
+    </table>`
+  )
+
   return NextResponse.json(ticket)
 }
 

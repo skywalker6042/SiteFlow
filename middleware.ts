@@ -1,4 +1,4 @@
-import { auth } from '@/lib/auth'
+import { auth } from '@/lib/auth-edge'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { ACTIVE_ORG_COOKIE } from '@/lib/auth-context'
@@ -12,6 +12,8 @@ export default auth((req: NextRequest & { auth: unknown }) => {
     pathname.startsWith('/api/auth') ||
     pathname.startsWith('/api/setup-requests') ||
     pathname.startsWith('/api/admin/pricing') ||
+    pathname.startsWith('/api/share') ||
+    pathname.startsWith('/api/cron') ||
     pathname.startsWith('/login') ||
     pathname.startsWith('/share') ||
     pathname.startsWith('/pricing') ||
@@ -31,7 +33,9 @@ export default auth((req: NextRequest & { auth: unknown }) => {
     return NextResponse.redirect(loginUrl)
   }
 
-  const isPlatformAdmin = session.user.platformRole === 'admin'
+  const platformRole = session.user.platformRole
+  const isPlatformAdmin = platformRole === 'admin'
+  const isPlatformStaff = platformRole === 'admin' || platformRole === 'support'
   const hasActiveOrg = !!req.cookies.get(ACTIVE_ORG_COOKIE)?.value
 
   // Admin in org context mode — allow through to dashboard
@@ -43,13 +47,13 @@ export default auth((req: NextRequest & { auth: unknown }) => {
     return NextResponse.next()
   }
 
-  // Admin without org context — restrict to /admin routes only
-  if (isPlatformAdmin && !pathname.startsWith('/admin') && !pathname.startsWith('/api/admin')) {
+  // Platform staff (admin/support) without org context — restrict to /admin routes only
+  if (isPlatformStaff && !hasActiveOrg && !pathname.startsWith('/admin') && !pathname.startsWith('/api/admin')) {
     return NextResponse.redirect(new URL('/admin', req.url))
   }
 
   // Regular user trying to hit /admin → send to /dashboard
-  if (!isPlatformAdmin && pathname.startsWith('/admin')) {
+  if (!isPlatformStaff && pathname.startsWith('/admin')) {
     return NextResponse.redirect(new URL('/dashboard', req.url))
   }
 
@@ -57,5 +61,5 @@ export default auth((req: NextRequest & { auth: unknown }) => {
 })
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|uploads/).*)'],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|uploads/|.*\\.png$|.*\\.jpg$|.*\\.jpeg$|.*\\.gif$|.*\\.svg$|.*\\.ico$|.*\\.webp$).*)'],
 }

@@ -85,12 +85,12 @@ function PermToggle({
       onClick={() => onChange(!checked)}
       className={cn(
         'flex items-center gap-2 px-3 py-2 rounded-lg text-left w-full transition-colors',
-        checked ? 'bg-orange-50' : 'hover:bg-gray-50'
+        checked ? 'bg-teal-50' : 'hover:bg-gray-50'
       )}
     >
       <div className={cn(
         'w-4 h-4 rounded border flex items-center justify-center flex-shrink-0',
-        checked ? 'bg-orange-500 border-orange-500' : 'border-gray-300 bg-white'
+        checked ? 'bg-teal-500 border-teal-500' : 'border-gray-300 bg-white'
       )}>
         {checked && <Check size={9} className="text-white" />}
       </div>
@@ -170,7 +170,7 @@ function RoleCard({
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full text-sm font-medium border border-gray-300 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-orange-400"
+              className="w-full text-sm font-medium border border-gray-300 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-teal-400"
             />
           ) : (
             <>
@@ -188,7 +188,7 @@ function RoleCard({
                 <X size={12} /> Cancel
               </button>
               <button onClick={handleSave} disabled={saving || !name.trim()}
-                className="text-xs bg-orange-500 text-white px-3 py-1.5 rounded-lg hover:bg-orange-600 disabled:opacity-50 flex items-center gap-1 font-medium">
+                className="text-xs bg-teal-500 text-white px-3 py-1.5 rounded-lg hover:bg-teal-600 disabled:opacity-50 flex items-center gap-1 font-medium">
                 <Check size={12} /> {saving ? 'Saving…' : 'Save'}
               </button>
             </>
@@ -288,7 +288,7 @@ export function RoleManager({ initialRoles }: { initialRoles: OrgRole[] }) {
       )}
 
       {showCreate ? (
-        <form onSubmit={handleCreate} className="rounded-xl border border-orange-200 bg-orange-50/40 p-4 flex flex-col gap-4">
+        <form onSubmit={handleCreate} className="rounded-xl border border-teal-200 bg-teal-50/40 p-4 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <p className="text-sm font-semibold text-gray-800">New Role</p>
             <button type="button" onClick={() => setShowCreate(false)} className="text-gray-400 hover:text-gray-700">
@@ -300,7 +300,7 @@ export function RoleManager({ initialRoles }: { initialRoles: OrgRole[] }) {
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               placeholder="Role name"
-              className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+              className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
               required
             />
             <div className="flex gap-1">
@@ -339,7 +339,7 @@ export function RoleManager({ initialRoles }: { initialRoles: OrgRole[] }) {
               Cancel
             </button>
             <button type="submit" disabled={creating || !newName.trim()}
-              className="flex-1 bg-orange-500 hover:bg-orange-600 disabled:opacity-40 text-white text-sm font-medium py-2 rounded-lg">
+              className="flex-1 bg-teal-500 hover:bg-teal-600 disabled:opacity-40 text-white text-sm font-medium py-2 rounded-lg">
               {creating ? 'Creating…' : 'Create Role'}
             </button>
           </div>
@@ -347,7 +347,7 @@ export function RoleManager({ initialRoles }: { initialRoles: OrgRole[] }) {
       ) : (
         <button
           onClick={() => setShowCreate(true)}
-          className="flex items-center gap-1.5 text-sm text-orange-500 font-medium hover:text-orange-600 self-start"
+          className="flex items-center gap-1.5 text-sm text-teal-500 font-medium hover:text-teal-600 self-start"
         >
           <Plus size={15} /> Create Role
         </button>

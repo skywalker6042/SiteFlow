@@ -79,7 +79,7 @@ export default async function SupportPage() {
       {/* Form card */}
       <div className="bg-white rounded-xl border border-gray-200 p-6">
         <h2 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
-          <MessageCircle size={16} className="text-orange-400" />
+          <MessageCircle size={16} className="text-teal-400" />
           Submit a Request
         </h2>
         <TicketForm

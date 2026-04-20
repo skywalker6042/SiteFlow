@@ -11,7 +11,7 @@ import type { UserPermissions } from '@/lib/permissions'
 export type AppUser = {
   id:           string
   email:        string
-  platformRole: 'admin' | 'org_user'
+  platformRole: 'admin' | 'support' | 'org_user'
   orgId:        string | null
   role:         'owner' | 'worker' | null
   permissions:  UserPermissions
@@ -49,7 +49,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         return {
           id:           row.id,
           email:        row.email,
-          platformRole: row.platform_role as 'admin' | 'org_user',
+          platformRole: row.platform_role as 'admin' | 'support' | 'org_user',
           orgId:        row.org_id ?? null,
           role:         (row.role ?? null) as 'owner' | 'worker' | null,
           permissions:  (row.permissions ?? {}) as UserPermissions,
@@ -96,7 +96,7 @@ declare module 'next-auth' {
       email:        string
       name?:        string | null
       image?:       string | null
-      platformRole: 'admin' | 'org_user'
+      platformRole: 'admin' | 'support' | 'org_user'
       orgId:        string | null
       role:         'owner' | 'worker' | null
       permissions:  UserPermissions
