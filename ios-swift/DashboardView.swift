@@ -11,9 +11,9 @@ struct DashboardView: View {
 
                     // KPI Cards
                     HStack(spacing: 10) {
-                        KPICard(title: "Total Owed", value: "$0.00", icon: "dollarsign.circle")
-                        KPICard(title: "Total Billed", value: "$0.00", icon: "doc.text")
-                        KPICard(title: "Active Jobs", value: "0", icon: "briefcase")
+                        KPICard(title: "Total Owed", value: "$5,000.00", icon: "dollarsign.circle")
+                        KPICard(title: "Total Billed", value: "$15,000.00", icon: "doc.text")
+                        KPICard(title: "Active Jobs", value: "3", icon: "briefcase")
                     }
                     .padding(.horizontal)
 
@@ -97,17 +97,33 @@ struct KPICard: View {
 
 struct JobCard: View {
     var body: some View {
-        VStack(alignment: .leading) {
-            Text("Job Name")
-                .font(.headline)
-            Text("Client: Client Name")
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("Sample Job Name")
+                    .font(.headline)
+                Spacer()
+                Text("In Progress")
+                    .font(.caption)
+                    .padding(4)
+                    .background(Color.blue.opacity(0.2))
+                    .cornerRadius(4)
+            }
+            Text("Client: Sample Client")
                 .font(.subheadline)
-            Text("Address")
+                .foregroundColor(.secondary)
+            Text("123 Sample Address")
                 .font(.caption)
+                .foregroundColor(.secondary)
             ProgressView(value: 0.5)
-                .progressViewStyle(LinearProgressViewStyle())
-            Text("50% Complete")
-                .font(.caption)
+                .progressViewStyle(LinearProgressViewStyle(tint: .blue))
+            HStack {
+                Text("50% Complete")
+                    .font(.caption)
+                Spacer()
+                Text("$10,000 / $20,000")
+                    .font(.caption)
+                    .foregroundColor(.green)
+            }
         }
         .padding()
         .background(Color(.systemGray6))
@@ -118,13 +134,23 @@ struct JobCard: View {
 
 struct WorkDayCard: View {
     var body: some View {
-        VStack(alignment: .leading) {
-            Text("Work Day Date")
-                .font(.headline)
-            Text("Job: Job Name")
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("2026-04-25")
+                    .font(.headline)
+                Spacer()
+                Text("Planned")
+                    .font(.caption)
+                    .padding(4)
+                    .background(Color.purple.opacity(0.2))
+                    .cornerRadius(4)
+            }
+            Text("Job: Sample Job")
                 .font(.subheadline)
-            Text("Assigned Workers: 2")
+                .foregroundColor(.secondary)
+            Text("Crew: Worker 1, Worker 2")
                 .font(.caption)
+                .foregroundColor(.secondary)
         }
         .padding()
         .background(Color(.systemGray6))

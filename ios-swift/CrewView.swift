@@ -22,20 +22,38 @@ struct CrewView: View {
 
 struct WorkerRow: View {
     var body: some View {
-        HStack {
+        HStack(spacing: 12) {
             Circle()
                 .fill(Color.blue)
                 .frame(width: 40, height: 40)
-            VStack(alignment: .leading) {
-                Text("Worker Name")
+                .overlay(
+                    Text("SW")
+                        .foregroundColor(.white)
+                        .font(.headline)
+                )
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Sample Worker")
                     .font(.headline)
-                Text("Specialty")
+                Text("Specialty: Electrician")
                     .font(.subheadline)
+                    .foregroundColor(.secondary)
+                Text("Role: Worker")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
             }
             Spacer()
-            Text("Role")
-                .font(.caption)
+            VStack(alignment: .trailing, spacing: 4) {
+                Text("sample@email.com")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                Button(action: {
+                    // Edit action
+                }) {
+                    Image(systemName: "pencil")
+                        .foregroundColor(.blue)
+                }
+            }
         }
-        .padding(.vertical, 5)
+        .padding(.vertical, 8)
     }
 }
