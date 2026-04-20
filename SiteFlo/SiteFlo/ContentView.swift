@@ -61,38 +61,32 @@ private struct MainTabView: View {
         enabledFeatures.contains(feature)
     }
 
+    private var trackTime: Bool {
+        appModel.bootstrap?.settings?.trackWorkerTime == true
+    }
+
     var body: some View {
         TabView {
             DashboardView()
-                .tabItem {
-                    Label("Home", systemImage: "square.grid.2x2.fill")
-                }
+                .tabItem { Label("Home", systemImage: "square.grid.2x2.fill") }
 
             if permissions?.canViewJobs == true || isOwner {
                 JobsView()
-                    .tabItem {
-                        Label("Jobs", systemImage: "hammer.fill")
-                    }
+                    .tabItem { Label("Jobs", systemImage: "hammer.fill") }
             }
 
-            if (permissions?.canViewCrew == true || isOwner) && hasFeature("crew") {
-                CrewView()
-                    .tabItem {
-                        Label("Workers", systemImage: "person.3.fill")
-                    }
+            if trackTime {
+                ClockView()
+                    .tabItem { Label("Clock", systemImage: "clock.fill") }
             }
 
             if (permissions?.canViewSchedule == true || isOwner) && hasFeature("calendar") {
                 CalendarView()
-                    .tabItem {
-                        Label("Calendar", systemImage: "calendar")
-                    }
+                    .tabItem { Label("Schedule", systemImage: "calendar") }
             }
 
-            SettingsView()
-                .tabItem {
-                    Label("Settings", systemImage: "gearshape.fill")
-                }
+            MoreView()
+                .tabItem { Label("More", systemImage: "ellipsis.circle.fill") }
         }
         .accentColor(SiteFlowPalette.teal)
         .task {

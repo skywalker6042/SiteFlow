@@ -92,6 +92,23 @@ async function run() {
   await sql`CREATE INDEX IF NOT EXISTS mobile_sessions_expires_at_idx ON mobile_sessions(expires_at)`
   console.log('✓ mobile_sessions table')
 
+  // worker_time_logs table
+  await sql`
+    CREATE TABLE IF NOT EXISTS worker_time_logs (
+      id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      company_id  UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+      user_id     UUID NOT NULL,
+      worker_name TEXT NOT NULL,
+      job_id      UUID,
+      job_name    TEXT,
+      clock_in    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      clock_out   TIMESTAMPTZ,
+      date        DATE NOT NULL DEFAULT CURRENT_DATE
+    )
+  `
+  await sql`CREATE INDEX IF NOT EXISTS worker_time_logs_user_date_idx ON worker_time_logs(user_id, date)`
+  console.log('✓ worker_time_logs table')
+
   console.log('\nAll migrations complete.')
   await sql.end()
 }
