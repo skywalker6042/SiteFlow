@@ -11,11 +11,11 @@ export async function POST(req: NextRequest) {
   }
 
   const rows = await sql`
-    SELECT u.id, u.email, u.password_hash
+    SELECT u.id, u.email, u.password_hash, u.platform_role
     FROM users u
     WHERE u.email = ${email.toLowerCase().trim()}
     LIMIT 1
-  ` as Array<{ id: string; email: string; password_hash: string }>
+  ` as Array<{ id: string; email: string; password_hash: string; platform_role: string }>
 
   const user = rows[0]
   if (!user) {
@@ -25,6 +25,10 @@ export async function POST(req: NextRequest) {
   const valid = await compare(password, user.password_hash)
   if (!valid) {
     return NextResponse.json({ error: 'Invalid email or password.' }, { status: 401 })
+  }
+
+  if (user.platform_role === 'admin' || user.platform_role === 'support') {
+    return NextResponse.json({ error: 'Admin accounts must use the web portal at siteflo.app.' }, { status: 403 })
   }
 
   await createMobileSession(user.id)
