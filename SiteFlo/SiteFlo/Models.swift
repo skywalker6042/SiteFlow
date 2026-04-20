@@ -35,6 +35,25 @@ struct Permissions: Decodable {
     let canViewChangeOrders: Bool
     let canManageChangeOrders: Bool
     let canViewAllJobs: Bool
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        canViewJobs            = (try? c.decode(Bool.self, forKey: .canViewJobs))            ?? false
+        canEditJobs            = (try? c.decode(Bool.self, forKey: .canEditJobs))            ?? false
+        canViewJobFinancials   = (try? c.decode(Bool.self, forKey: .canViewJobFinancials))   ?? false
+        canViewSchedule        = (try? c.decode(Bool.self, forKey: .canViewSchedule))        ?? false
+        canManageSchedule      = (try? c.decode(Bool.self, forKey: .canManageSchedule))      ?? false
+        canViewCrew            = (try? c.decode(Bool.self, forKey: .canViewCrew))            ?? false
+        canViewFinancials      = (try? c.decode(Bool.self, forKey: .canViewFinancials))      ?? false
+        canViewActivity        = (try? c.decode(Bool.self, forKey: .canViewActivity))        ?? false
+        canUploadPhotos        = (try? c.decode(Bool.self, forKey: .canUploadPhotos))        ?? false
+        canViewTasks           = (try? c.decode(Bool.self, forKey: .canViewTasks))           ?? false
+        canCompleteTasks       = (try? c.decode(Bool.self, forKey: .canCompleteTasks))       ?? false
+        canManageTasks         = (try? c.decode(Bool.self, forKey: .canManageTasks))         ?? false
+        canViewChangeOrders    = (try? c.decode(Bool.self, forKey: .canViewChangeOrders))    ?? false
+        canManageChangeOrders  = (try? c.decode(Bool.self, forKey: .canManageChangeOrders))  ?? false
+        canViewAllJobs         = (try? c.decode(Bool.self, forKey: .canViewAllJobs))         ?? false
+    }
 }
 
 struct OrganizationSummary: Decodable {
