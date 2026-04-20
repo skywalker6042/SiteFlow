@@ -137,3 +137,63 @@ struct SettingsPayload: Decodable {
     let trackWorkerTime: Bool
     let trackWorkerJob: Bool
 }
+
+// MARK: - Job Detail
+
+struct JobDetail: Decodable {
+    let job: JobDetailInfo
+    let phases: [JobPhase]
+    let tasks: [JobTask]
+    let photos: [JobPhoto]
+    let changeOrders: [ChangeOrder]
+}
+
+struct JobDetailInfo: Decodable {
+    let id: String
+    let name: String
+    let clientName: String?
+    let clientPhone: String?
+    let address: String?
+    let scope: String?
+    let status: String
+    let percentComplete: Int
+    let totalValue: Double?
+    let amountBilled: Double?
+    let amountPaid: Double?
+    let plannedStart: String?
+    let startDate: String?
+    let endDate: String?
+    let shareToken: String?
+}
+
+struct JobPhase: Decodable, Identifiable {
+    let id: String
+    let name: String
+    let status: String
+    let orderIndex: Int
+    let notes: String?
+    let groupName: String?
+}
+
+struct JobTask: Decodable, Identifiable {
+    let id: String
+    let phaseId: String?
+    let name: String
+    let status: String
+    let orderIndex: Int
+    let notes: String?
+    let billable: Bool
+}
+
+struct JobPhoto: Decodable, Identifiable {
+    let id: String
+    let storagePath: String
+    let caption: String?
+}
+
+struct ChangeOrder: Decodable, Identifiable {
+    let id: String
+    let description: String
+    let amount: Double
+    let approved: Bool
+}

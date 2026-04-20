@@ -36,8 +36,12 @@ struct JobsView: View {
                             .foregroundStyle(SiteFlowPalette.slate)
                     }
                 } else {
+                    let showFinancials = appModel.bootstrap?.user.permissions.canViewJobFinancials == true || appModel.bootstrap?.user.isOwner == true
                     ForEach(filteredJobs) { job in
-                        JobRow(job: job, showFinancials: appModel.bootstrap?.user.permissions.canViewJobFinancials == true || appModel.bootstrap?.user.isOwner == true)
+                        NavigationLink(destination: JobDetailView(jobId: job.id, jobName: job.name)) {
+                            JobRow(job: job, showFinancials: showFinancials)
+                        }
+                        .buttonStyle(.plain)
                     }
                 }
             }

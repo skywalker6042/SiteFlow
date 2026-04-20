@@ -130,7 +130,7 @@ struct ClockView: View {
 
     private func todaySection(logs: [ClockEntry]) -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            SiteFlowSectionHeader(title: "Today")
+            SiteFlowSectionHeader("Today")
             SiteFlowCard {
                 ForEach(Array(logs.enumerated()), id: \.element.id) { index, log in
                     if index > 0 { Divider() }
