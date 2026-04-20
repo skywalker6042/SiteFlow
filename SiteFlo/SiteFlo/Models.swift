@@ -36,6 +36,13 @@ struct Permissions: Decodable {
     let canManageChangeOrders: Bool
     let canViewAllJobs: Bool
 
+    enum CodingKeys: String, CodingKey {
+        case canViewJobs, canEditJobs, canViewJobFinancials, canViewSchedule
+        case canManageSchedule, canViewCrew, canViewFinancials, canViewActivity
+        case canUploadPhotos, canViewTasks, canCompleteTasks, canManageTasks
+        case canViewChangeOrders, canManageChangeOrders, canViewAllJobs
+    }
+
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         canViewJobs            = (try? c.decode(Bool.self, forKey: .canViewJobs))            ?? false
