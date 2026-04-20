@@ -158,6 +158,18 @@ export async function GET() {
     `,
   ])
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const toJobSummary = (j: any) => ({
+    id: j.id,
+    name: j.name,
+    clientName: j.client_name ?? null,
+    address: j.address ?? null,
+    status: j.status,
+    percentComplete: Number(j.percent_complete),
+    totalValue: j.total_value != null ? Number(j.total_value) : null,
+    amountPaid: j.amount_paid != null ? Number(j.amount_paid) : null,
+  })
+
   const org = orgRows[0]
   const kpis = kpiRows[0] ?? {}
   const plan = ((org?.plan ?? 'trial') as PlanTier)
@@ -190,10 +202,10 @@ export async function GET() {
       totalOwed: Number((kpis as { total_owed?: number }).total_owed ?? 0),
       totalBilled: Number((kpis as { total_billed?: number }).total_billed ?? 0),
       totalUnbilled: Number((kpis as { total_unbilled?: number }).total_unbilled ?? 0),
-      activeJobs: jobRows.filter((job) => job.status === 'in_progress').slice(0, 5),
+      activeJobs: jobRows.filter((job) => job.status === 'in_progress').slice(0, 5).map(toJobSummary),
       upcomingDays: upcomingRows,
     },
-    jobs: jobRows,
+    jobs: jobRows.map(toJobSummary),
     workers: workerRows,
     calendar: {
       year,

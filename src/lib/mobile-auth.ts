@@ -112,7 +112,7 @@ export async function getMobileSessionUser(): Promise<AppUser | null> {
     platformRole: row.platform_role,
     orgId: row.org_id ?? null,
     role: row.role ?? null,
-    permissions: (row.permissions ?? {}) as UserPermissions,
+    permissions: (typeof row.permissions === 'string' ? JSON.parse(row.permissions) : (row.permissions ?? {})) as UserPermissions,
     workerId: row.worker_id ?? null,
   }
 }
