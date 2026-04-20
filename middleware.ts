@@ -10,6 +10,7 @@ export default auth((req: NextRequest & { auth: unknown }) => {
   // Always allow auth routes, share pages, public pages, and static assets
   if (
     pathname.startsWith('/api/auth') ||
+    pathname.startsWith('/api/mobile') ||
     pathname.startsWith('/api/setup-requests') ||
     pathname.startsWith('/api/admin/pricing') ||
     pathname.startsWith('/api/share') ||
