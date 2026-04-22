@@ -67,7 +67,7 @@ struct LoginView: View {
                         }
 
                         Button {
-                            Task {
+                            Task { @MainActor in
                                 await appModel.login(email: email, password: password)
                             }
                         } label: {

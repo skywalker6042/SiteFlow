@@ -46,7 +46,7 @@ struct ClockView: View {
                 }
             }
         }
-        .task { await load() }
+        .task { @MainActor in await load() }
         .refreshable { await load() }
     }
 
@@ -106,7 +106,13 @@ struct ClockView: View {
                 }
 
                 Button {
-                    Task { isClockedIn ? await clockOut() : await clockIn() }
+                    Task { @MainActor in
+                        if isClockedIn {
+                            await clockOut()
+                        } else {
+                            await clockIn()
+                        }
+                    }
                 } label: {
                     HStack(spacing: 8) {
                         if isLoading {

@@ -8,7 +8,7 @@ struct ContentView: View {
             switch appModel.phase {
             case .loading:
                 SplashView()
-                    .task {
+                    .task { @MainActor in
                         await appModel.restoreSession()
                     }
             case .signedOut:
@@ -95,7 +95,7 @@ private struct MainTabView: View {
                 }
         }
         .tint(SiteFlowPalette.teal)
-        .task {
+        .task { @MainActor in
             if appModel.bootstrap == nil {
                 try? await appModel.refresh()
             }

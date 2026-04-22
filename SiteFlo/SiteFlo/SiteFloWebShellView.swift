@@ -166,7 +166,7 @@ struct SiteFloWebShellView: View {
                 errorOverlay(message: errorMessage)
             }
         }
-        .task {
+        .task { @MainActor in
             model.loadIfNeeded()
         }
     }

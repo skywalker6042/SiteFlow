@@ -53,7 +53,7 @@ struct JobDetailView: View {
         }
         .navigationTitle(jobName)
         .navigationBarTitleDisplayMode(.inline)
-        .task { await load() }
+        .task { @MainActor in await load() }
     }
 
     private func load() async {
@@ -73,7 +73,11 @@ struct JobDetailView: View {
         }
     }
 
-    private func reload() { Task { await load() } }
+    private func reload() {
+        Task { @MainActor in
+            await load()
+        }
+    }
 }
 
 // MARK: - Overview Tab
@@ -273,7 +277,9 @@ private struct TaskRow: View {
         HStack(spacing: 12) {
             if canComplete {
                 Button {
-                    Task { await onToggle() }
+                    Task { @MainActor in
+                        await onToggle()
+                    }
                 } label: {
                     if isToggling {
                         ProgressView().frame(width: 22, height: 22)
@@ -334,7 +340,11 @@ private struct PhotosTab: View {
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
                 .onChange(of: selectedItems) { _, items in
-                    if !items.isEmpty { Task { await uploadPhotos(items) } }
+                    if !items.isEmpty {
+                        Task { @MainActor in
+                            await uploadPhotos(items)
+                        }
+                    }
                 }
 
                 if isUploading {

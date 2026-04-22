@@ -1,5 +1,10 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## iOS App
+
+The canonical iOS project lives in `SiteFlo/SiteFlo.xcodeproj`, and the app source files live in `SiteFlo/SiteFlo/`.
+Open that Xcode project when working on the iOS build.
+
 ## Getting Started
 
 First, run the development server:

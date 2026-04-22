@@ -47,7 +47,7 @@ struct SettingsView: View {
             infoRow(label: "Server", value: serverLabel)
 
             Button(role: .destructive) {
-                Task {
+                Task { @MainActor in
                     await appModel.logout()
                 }
             } label: {

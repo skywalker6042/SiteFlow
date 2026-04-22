@@ -53,9 +53,9 @@ struct CalendarView: View {
                 }
             }
         }
-        .task { await fetchData() }
-        .onChange(of: mode)   { _, _ in Task { await fetchData() } }
-        .onChange(of: anchor) { _, _ in Task { await fetchData() } }
+        .task { @MainActor in await fetchData() }
+        .onChange(of: mode)   { _, _ in Task { @MainActor in await fetchData() } }
+        .onChange(of: anchor) { _, _ in Task { @MainActor in await fetchData() } }
     }
 
     private func navigate(by value: Int) {
