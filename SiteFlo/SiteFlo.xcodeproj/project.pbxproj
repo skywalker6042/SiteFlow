@@ -256,6 +256,8 @@
 				DEVELOPMENT_TEAM = DBVS9Y457L;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "SiteFlo uses the camera so you can upload job photos and receipts.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "SiteFlo uses your photo library so you can attach job photos and receipts.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -289,6 +291,8 @@
 				DEVELOPMENT_TEAM = DBVS9Y457L;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "SiteFlo uses the camera so you can upload job photos and receipts.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "SiteFlo uses your photo library so you can attach job photos and receipts.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
