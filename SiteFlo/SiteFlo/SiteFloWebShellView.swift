@@ -37,8 +37,9 @@ final class SiteFloWebViewModel: NSObject, ObservableObject {
 
         observers = [
             webView.observe(\.isLoading, options: [.initial, .new]) { [weak self] webView, _ in
-                Task { @MainActor in
-                    self?.isLoading = webView.isLoading
+                let isLoading = webView.isLoading
+                DispatchQueue.main.async { [weak self] in
+                    self?.isLoading = isLoading
                 }
             }
         ]
