@@ -8,126 +8,95 @@ struct LoginView: View {
     @State private var showPassword = false
 
     var body: some View {
-        ZStack {
-            SiteFlowPalette.background.ignoresSafeArea()
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 24) {
+                    VStack(spacing: 12) {
+                        Image("Logo")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 68, height: 68)
 
-            VStack(spacing: 24) {
-                VStack(spacing: 14) {
-                    Image("Logo")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 72, height: 72)
-
-                    VStack(spacing: 6) {
                         Text("SiteFlo")
-                            .font(.system(size: 34, weight: .bold))
-                            .foregroundStyle(SiteFlowPalette.ink)
-
-                        Rectangle()
-                            .fill(SiteFlowPalette.teal)
-                            .frame(width: 36, height: 3)
-                            .clipShape(Capsule())
+                            .font(.largeTitle.bold())
 
                         Text("Sign in to your contractor workspace")
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundStyle(SiteFlowPalette.slate)
-                    }
-                }
-
-                SiteFlowCard {
-                    Text("Sign In")
-                        .font(.system(size: 20, weight: .semibold))
-                        .foregroundStyle(SiteFlowPalette.ink)
-
-
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Email")
-                            .font(.system(size: 13, weight: .medium))
-                            .foregroundStyle(SiteFlowPalette.slate)
-                        TextField("you@example.com", text: $email)
-                            .textInputAutocapitalization(.never)
-                            .keyboardType(.emailAddress)
-                            .autocorrectionDisabled()
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 12)
-                            .background(Color.white)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 14)
-                                    .stroke(SiteFlowPalette.border, lineWidth: 1)
-                            )
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
                     }
 
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Password")
-                            .font(.system(size: 13, weight: .medium))
-                            .foregroundStyle(SiteFlowPalette.slate)
+                    VStack(alignment: .leading, spacing: 12) {
+                        if let errorMessage = appModel.errorMessage {
+                            ContentUnavailableView {
+                                Label("Sign-In Error", systemImage: "exclamationmark.triangle.fill")
+                            } description: {
+                                Text(errorMessage)
+                            }
+                        }
 
-                        HStack {
-                            Group {
-                                if showPassword {
-                                    TextField("Password", text: $password)
-                                } else {
-                                    SecureField("Password", text: $password)
+                        GroupBox {
+                            VStack(spacing: 16) {
+                                TextField("you@example.com", text: $email)
+                                    .textInputAutocapitalization(.never)
+                                    .keyboardType(.emailAddress)
+                                    .textContentType(.username)
+                                    .autocorrectionDisabled()
+
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Group {
+                                        if showPassword {
+                                            TextField("Password", text: $password)
+                                        } else {
+                                            SecureField("Password", text: $password)
+                                        }
+                                    }
+                                    .textInputAutocapitalization(.never)
+                                    .textContentType(.password)
+                                    .autocorrectionDisabled()
+
+                                    Button(showPassword ? "Hide Password" : "Show Password") {
+                                        showPassword.toggle()
+                                    }
+                                    .font(.footnote.weight(.semibold))
                                 }
                             }
-                            .textInputAutocapitalization(.never)
-                            .autocorrectionDisabled()
+                            .textFieldStyle(.roundedBorder)
+                        } label: {
+                            Label("Sign In", systemImage: "person.crop.circle")
+                                .font(.headline)
+                        }
 
-                            Button(showPassword ? "Hide" : "Show") {
-                                showPassword.toggle()
+                        Button {
+                            Task {
+                                await appModel.login(email: email, password: password)
                             }
-                            .font(.system(size: 13, weight: .semibold))
-                            .foregroundStyle(SiteFlowPalette.slate)
-                        }
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 12)
-                        .background(Color.white)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 14)
-                                .stroke(SiteFlowPalette.border, lineWidth: 1)
-                        )
-                    }
-
-                    if let errorMessage = appModel.errorMessage {
-                        Text(errorMessage)
-                            .font(.system(size: 13, weight: .medium))
-                            .foregroundStyle(SiteFlowPalette.red)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(12)
-                            .background(SiteFlowPalette.red.opacity(0.08))
-                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                    }
-
-                    Button {
-                        Task {
-                            await appModel.login(email: email, password: password)
-                        }
-                    } label: {
-                        HStack {
-                            if appModel.isBusy {
-                                ProgressView()
-                                    .progressViewStyle(.circular)
-                                    .tint(.white)
+                        } label: {
+                            HStack {
+                                if appModel.isBusy {
+                                    ProgressView()
+                                        .progressViewStyle(.circular)
+                                }
+                                Text(appModel.isBusy ? "Signing In..." : "Sign In")
+                                    .fontWeight(.semibold)
                             }
-                            Text(appModel.isBusy ? "Signing In..." : "Sign In")
-                                .font(.system(size: 15, weight: .semibold))
+                            .frame(maxWidth: .infinity)
                         }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 14)
-                        .foregroundStyle(.white)
-                        .background(SiteFlowPalette.teal)
-                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.large)
+                        .disabled(appModel.isBusy || email.isEmpty || password.isEmpty)
+
+                        Text("Use the same SiteFlo login you use on the web.")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity, alignment: .center)
                     }
-                    .disabled(appModel.isBusy)
+                    .frame(maxWidth: 420)
                 }
+                .frame(maxWidth: .infinity)
                 .padding(.horizontal, 20)
-
-                Text("Use the same SiteFlo login you use on the web.")
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(SiteFlowPalette.slate)
+                .padding(.vertical, 32)
             }
-            .frame(maxWidth: 420)
-            .padding(20)
+            .background(Color(.systemGroupedBackground).ignoresSafeArea())
         }
     }
 }

@@ -3,23 +3,23 @@ import SwiftUI
 struct SettingsView: View {
     @Environment(AppModel.self) private var appModel
 
-    var body: some View {
-        NavigationStack {
-            SiteFlowScreen(title: "Settings") {
-                profileCard
-                invoiceCard
-                crewCard
-                accountCard
-            }
-        }
+    private var serverLabel: String {
+        appModel.serverURL?.absoluteString ?? "https://siteflo.app"
     }
 
-    private var profileCard: some View {
-        SiteFlowCard {
-            Text("Company Profile")
-                .font(.system(size: 17, weight: .semibold))
-                .foregroundStyle(SiteFlowPalette.ink)
+    var body: some View {
+        Form {
+            profileSection
+            invoiceSection
+            crewSection
+            accountSection
+        }
+        .navigationTitle("Settings")
+        .navigationBarTitleDisplayMode(.large)
+    }
 
+    private var profileSection: some View {
+        Section("Company Profile") {
             infoRow(label: "Company", value: appModel.bootstrap?.settings?.companyName ?? appModel.orgName)
             infoRow(label: "Phone", value: appModel.bootstrap?.settings?.companyPhone ?? "Not set")
             infoRow(label: "Plan", value: appModel.bootstrap?.org?.plan.capitalized ?? "Trial")
@@ -27,35 +27,24 @@ struct SettingsView: View {
         }
     }
 
-    private var invoiceCard: some View {
-        SiteFlowCard {
-            Text("Invoice Settings")
-                .font(.system(size: 17, weight: .semibold))
-                .foregroundStyle(SiteFlowPalette.ink)
-
+    private var invoiceSection: some View {
+        Section("Invoice Settings") {
             toggleRow(title: "Separate Change Orders", value: appModel.bootstrap?.settings?.coSeparateInvoice ?? false)
             toggleRow(title: "Require Signature", value: appModel.bootstrap?.settings?.requireSignature ?? false)
         }
     }
 
-    private var crewCard: some View {
-        SiteFlowCard {
-            Text("Crew & Time Tracking")
-                .font(.system(size: 17, weight: .semibold))
-                .foregroundStyle(SiteFlowPalette.ink)
-
+    private var crewSection: some View {
+        Section("Crew & Time Tracking") {
             toggleRow(title: "Track Worker Time", value: appModel.bootstrap?.settings?.trackWorkerTime ?? false)
             toggleRow(title: "Track Worker by Job", value: appModel.bootstrap?.settings?.trackWorkerJob ?? false)
         }
     }
 
-    private var accountCard: some View {
-        SiteFlowCard {
-            Text("Account")
-                .font(.system(size: 17, weight: .semibold))
-                .foregroundStyle(SiteFlowPalette.ink)
-
+    private var accountSection: some View {
+        Section("Account") {
             infoRow(label: "Signed In As", value: appModel.userEmail)
+            infoRow(label: "Server", value: serverLabel)
 
             Button(role: .destructive) {
                 Task {
@@ -63,24 +52,16 @@ struct SettingsView: View {
                 }
             } label: {
                 Text("Sign Out")
-                    .font(.system(size: 15, weight: .semibold))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
             }
-            .buttonStyle(.borderedProminent)
-            .tint(SiteFlowPalette.red)
         }
     }
 
     private func infoRow(label: String, value: String) -> some View {
         HStack {
             Text(label)
-                .font(.system(size: 14, weight: .medium))
-                .foregroundStyle(SiteFlowPalette.slate)
             Spacer()
             Text(value)
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(SiteFlowPalette.ink)
+                .foregroundStyle(.secondary)
                 .multilineTextAlignment(.trailing)
         }
     }
@@ -88,8 +69,6 @@ struct SettingsView: View {
     private func toggleRow(title: String, value: Bool) -> some View {
         HStack {
             Text(title)
-                .font(.system(size: 14, weight: .medium))
-                .foregroundStyle(SiteFlowPalette.slate)
             Spacer()
             Image(systemName: value ? "checkmark.circle.fill" : "xmark.circle.fill")
                 .foregroundStyle(value ? SiteFlowPalette.teal : SiteFlowPalette.slate)

@@ -4,7 +4,19 @@ struct ContentView: View {
     @Environment(AppModel.self) private var appModel
 
     var body: some View {
-        SiteFloWebShellView(baseURL: appModel.serverURL ?? URL(string: "https://siteflo.app")!)
+        Group {
+            switch appModel.phase {
+            case .loading:
+                SplashView()
+                    .task {
+                        await appModel.restoreSession()
+                    }
+            case .signedOut:
+                LoginView()
+            case .signedIn:
+                MainTabView()
+            }
+        }
     }
 }
 
@@ -25,6 +37,67 @@ struct SplashView: View {
 
                 ProgressView()
                     .tint(.white)
+            }
+        }
+    }
+}
+
+private struct MainTabView: View {
+    @Environment(AppModel.self) private var appModel
+
+    private var permissions: Permissions? {
+        appModel.bootstrap?.user.permissions
+    }
+
+    private var enabledFeatures: [String] {
+        appModel.bootstrap?.org?.enabledFeatures ?? []
+    }
+
+    private var isOwner: Bool {
+        appModel.bootstrap?.user.isOwner ?? false
+    }
+
+    private func hasFeature(_ feature: String) -> Bool {
+        enabledFeatures.contains(feature)
+    }
+
+    var body: some View {
+        TabView {
+            DashboardView()
+                .tabItem {
+                    Label("Home", systemImage: "house.fill")
+                }
+
+            if permissions?.canViewJobs == true || isOwner {
+                JobsView()
+                    .tabItem {
+                        Label("Jobs", systemImage: "briefcase.fill")
+                    }
+            }
+
+            if (permissions?.canViewSchedule == true || isOwner) && hasFeature("calendar") {
+                CalendarView()
+                    .tabItem {
+                        Label("Schedule", systemImage: "calendar")
+                    }
+            }
+
+            if (permissions?.canViewCrew == true || isOwner) && hasFeature("crew") {
+                CrewView()
+                    .tabItem {
+                        Label("Crew", systemImage: "person.3.fill")
+                    }
+            }
+
+            MoreView()
+                .tabItem {
+                    Label("More", systemImage: "ellipsis.circle.fill")
+                }
+        }
+        .tint(SiteFlowPalette.teal)
+        .task {
+            if appModel.bootstrap == nil {
+                try? await appModel.refresh()
             }
         }
     }

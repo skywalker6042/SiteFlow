@@ -21,30 +21,35 @@ struct JobsView: View {
 
     var body: some View {
         NavigationStack {
-            SiteFlowScreen(title: "Jobs") {
-                Picker("Jobs", selection: $selectedTab) {
-                    ForEach(0..<tabs.count, id: \.self) { index in
-                        Text(tabs[index]).tag(index)
+            List {
+                Section {
+                    Picker("Jobs", selection: $selectedTab) {
+                        ForEach(0..<tabs.count, id: \.self) { index in
+                            Text(tabs[index]).tag(index)
+                        }
                     }
+                    .pickerStyle(.segmented)
                 }
-                .pickerStyle(.segmented)
 
                 if filteredJobs.isEmpty {
-                    SiteFlowCard {
-                        Text(emptyState)
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundStyle(SiteFlowPalette.slate)
-                    }
+                    ContentUnavailableView(
+                        "No Jobs",
+                        systemImage: "briefcase",
+                        description: Text(emptyState)
+                    )
+                    .listRowBackground(Color.clear)
                 } else {
                     let showFinancials = appModel.bootstrap?.user.permissions.canViewJobFinancials == true || appModel.bootstrap?.user.isOwner == true
                     ForEach(filteredJobs) { job in
                         NavigationLink(destination: JobDetailView(jobId: job.id, jobName: job.name)) {
                             JobRow(job: job, showFinancials: showFinancials)
                         }
-                        .buttonStyle(.plain)
                     }
                 }
             }
+            .listStyle(.insetGrouped)
+            .navigationTitle("Jobs")
+            .navigationBarTitleDisplayMode(.large)
             .refreshable {
                 try? await appModel.refresh()
             }

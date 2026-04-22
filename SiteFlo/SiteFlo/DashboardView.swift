@@ -12,74 +12,59 @@ struct DashboardView: View {
 
     var body: some View {
         NavigationStack {
-            SiteFlowScreen(title: "Dashboard") {
-                header
-                kpis
-                upcomingDays
-                activeJobs
+            List {
+                headerSection
+                metricsSection
+                upcomingSection
+                jobsSection
             }
+            .listStyle(.insetGrouped)
+            .navigationTitle("Home")
+            .navigationBarTitleDisplayMode(.large)
             .refreshable {
                 try? await appModel.refresh()
             }
         }
     }
 
-    private var header: some View {
-        ZStack(alignment: .bottomLeading) {
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .fill(
-                    LinearGradient(
-                        colors: [SiteFlowPalette.ink, Color.black.opacity(0.84)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-
-            VStack(alignment: .leading, spacing: 18) {
-                OrgPill(name: appModel.orgName, subtitle: "General Contractor")
-
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("\(greeting), \(appModel.orgName)")
-                        .font(.system(size: 24, weight: .bold))
-                        .foregroundStyle(.white)
-                    Text("Here’s what’s going on across the business right now.")
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundStyle(Color.white.opacity(0.68))
-                }
+    private var headerSection: some View {
+        Section {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("\(greeting), \(appModel.orgName)")
+                    .font(.title2.weight(.bold))
+                Text("Here’s what’s going on across the business right now.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
             }
-            .padding(20)
         }
-        .frame(height: 186)
     }
 
-    private var kpis: some View {
+    private var metricsSection: some View {
         let dashboard = appModel.bootstrap?.dashboard
+        let canViewFinancials = appModel.bootstrap?.user.permissions.canViewJobFinancials == true || appModel.bootstrap?.user.isOwner == true
 
-        return LazyVGrid(columns: [
-            GridItem(.flexible(), spacing: 12),
-            GridItem(.flexible(), spacing: 12)
-        ], spacing: 12) {
-            KpiView(title: "In Progress", value: "\(dashboard?.activeCount ?? 0)", icon: "hammer.fill", accent: SiteFlowPalette.teal)
+        return Section("Overview") {
+            DashboardMetricRow(title: "In Progress", value: "\(dashboard?.activeCount ?? 0)", systemImage: "hammer.fill", tint: SiteFlowPalette.teal)
 
-            if appModel.bootstrap?.user.permissions.canViewJobFinancials == true || appModel.bootstrap?.user.isOwner == true {
-                KpiView(title: "Outstanding", value: formatCurrency(dashboard?.totalOwed ?? 0), icon: "exclamationmark.circle.fill", accent: SiteFlowPalette.red)
-                KpiView(title: "Billed", value: formatCurrency(dashboard?.totalBilled ?? 0), icon: "chart.line.uptrend.xyaxis", accent: SiteFlowPalette.blue)
-                KpiView(title: "Unbilled", value: formatCurrency(dashboard?.totalUnbilled ?? 0), icon: "dollarsign.circle.fill", accent: SiteFlowPalette.amber)
+            if canViewFinancials {
+                DashboardMetricRow(title: "Outstanding", value: formatCurrency(dashboard?.totalOwed ?? 0), systemImage: "exclamationmark.circle.fill", tint: SiteFlowPalette.red)
+                DashboardMetricRow(title: "Billed", value: formatCurrency(dashboard?.totalBilled ?? 0), systemImage: "chart.line.uptrend.xyaxis", tint: SiteFlowPalette.blue)
+                DashboardMetricRow(title: "Unbilled", value: formatCurrency(dashboard?.totalUnbilled ?? 0), systemImage: "dollarsign.circle.fill", tint: SiteFlowPalette.amber)
             }
         }
     }
 
-    private var upcomingDays: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            SiteFlowSectionHeader("Next 7 Days")
+    private var upcomingSection: some View {
+        let upcoming = appModel.bootstrap?.dashboard?.upcomingDays ?? []
 
-            let upcoming = appModel.bootstrap?.dashboard?.upcomingDays ?? []
+        return Section("Next 7 Days") {
             if upcoming.isEmpty {
-                SiteFlowCard {
-                    Text("No work days scheduled this week.")
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundStyle(SiteFlowPalette.slate)
-                }
+                ContentUnavailableView(
+                    "No Work Scheduled",
+                    systemImage: "calendar.badge.exclamationmark",
+                    description: Text("No work days are scheduled this week.")
+                )
+                .listRowBackground(Color.clear)
             } else {
                 ForEach(upcoming) { day in
                     WorkDayRow(day: day)
@@ -88,50 +73,48 @@ struct DashboardView: View {
         }
     }
 
-    private var activeJobs: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            SiteFlowSectionHeader("In Progress")
+    private var jobsSection: some View {
+        let jobs = appModel.bootstrap?.dashboard?.activeJobs ?? []
+        let showFinancials = appModel.bootstrap?.user.permissions.canViewJobFinancials == true || appModel.bootstrap?.user.isOwner == true
 
-            let jobs = appModel.bootstrap?.dashboard?.activeJobs ?? []
+        return Section("In Progress") {
             if jobs.isEmpty {
-                SiteFlowCard {
-                    Text("No jobs are in progress.")
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundStyle(SiteFlowPalette.slate)
-                }
+                ContentUnavailableView(
+                    "No Active Jobs",
+                    systemImage: "briefcase",
+                    description: Text("No jobs are in progress.")
+                )
+                .listRowBackground(Color.clear)
             } else {
-                let showFinancials = appModel.bootstrap?.user.permissions.canViewJobFinancials == true || appModel.bootstrap?.user.isOwner == true
                 ForEach(jobs) { job in
                     NavigationLink(destination: JobDetailView(jobId: job.id, jobName: job.name)) {
                         JobRow(job: job, showFinancials: showFinancials)
                     }
-                    .buttonStyle(.plain)
                 }
             }
         }
     }
 }
 
-private struct KpiView: View {
+private struct DashboardMetricRow: View {
     let title: String
     let value: String
-    let icon: String
-    let accent: Color
+    let systemImage: String
+    let tint: Color
 
     var body: some View {
-        SiteFlowCard {
-            HStack {
-                Image(systemName: icon)
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundStyle(accent)
-                Text(title.uppercased())
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(SiteFlowPalette.slate)
-            }
+        HStack(spacing: 12) {
+            Image(systemName: systemImage)
+                .foregroundStyle(tint)
+                .frame(width: 24)
+
+            Text(title)
+
+            Spacer()
 
             Text(value)
-                .font(.system(size: 24, weight: .bold))
-                .foregroundStyle(SiteFlowPalette.ink)
+                .fontWeight(.semibold)
+                .foregroundStyle(.primary)
         }
     }
 }
@@ -143,21 +126,23 @@ struct JobRow: View {
     var body: some View {
         let badge = statusBadge(for: job.status)
 
-        SiteFlowCard {
-            HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top, spacing: 12) {
+                VStack(alignment: .leading, spacing: 4) {
                     Text(job.name)
-                        .font(.system(size: 17, weight: .semibold))
-                        .foregroundStyle(SiteFlowPalette.ink)
+                        .font(.headline)
+                        .foregroundStyle(.primary)
+
                     if let client = job.clientName, !client.isEmpty {
                         Text(client)
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundStyle(SiteFlowPalette.slate)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
                     }
+
                     if let address = job.address, !address.isEmpty {
                         Text(address)
-                            .font(.system(size: 13, weight: .medium))
-                            .foregroundStyle(SiteFlowPalette.slate.opacity(0.92))
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
                     }
                 }
 
@@ -166,25 +151,24 @@ struct JobRow: View {
                 StatusBadge(title: displayStatus(job.status), foreground: badge.0, background: badge.1)
             }
 
-            VStack(alignment: .leading, spacing: 8) {
-                ProgressView(value: Double(job.percentComplete), total: 100)
-                    .tint(SiteFlowPalette.teal)
+            ProgressView(value: Double(job.percentComplete), total: 100)
+                .tint(SiteFlowPalette.teal)
 
-                HStack {
-                    Text("\(job.percentComplete)% Complete")
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(SiteFlowPalette.slate)
+            HStack {
+                Text("\(job.percentComplete)% Complete")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.secondary)
 
-                    Spacer()
+                Spacer()
 
-                    if showFinancials {
-                        Text("\(formatCurrency(job.amountPaid ?? 0)) / \(formatCurrency(job.totalValue ?? 0))")
-                            .font(.system(size: 12, weight: .semibold))
-                            .foregroundStyle(SiteFlowPalette.teal)
-                    }
+                if showFinancials {
+                    Text("\(formatCurrency(job.amountPaid ?? 0)) / \(formatCurrency(job.totalValue ?? 0))")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(SiteFlowPalette.teal)
                 }
             }
         }
+        .padding(.vertical, 4)
     }
 }
 
@@ -194,20 +178,19 @@ struct WorkDayRow: View {
     var body: some View {
         let badge = statusBadge(for: day.status)
 
-        SiteFlowCard {
-            HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .top, spacing: 12) {
+                VStack(alignment: .leading, spacing: 4) {
                     Text(shortDateLabel(day.date))
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(SiteFlowPalette.ink)
+                        .font(.headline)
                     Text(day.jobName)
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundStyle(SiteFlowPalette.slate)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
 
                     if !day.workers.isEmpty {
                         Text(day.workers.map(\.name).joined(separator: ", "))
-                            .font(.system(size: 12, weight: .medium))
-                            .foregroundStyle(SiteFlowPalette.slate.opacity(0.95))
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
                     }
                 }
 
@@ -216,5 +199,6 @@ struct WorkDayRow: View {
                 StatusBadge(title: displayStatus(day.status), foreground: badge.0, background: badge.1)
             }
         }
+        .padding(.vertical, 4)
     }
 }
