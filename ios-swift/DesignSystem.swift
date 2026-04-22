@@ -90,6 +90,12 @@ struct StatusBadge: View {
     let foreground: Color
     let background: Color
 
+    init(title: String, foreground: Color, background: Color) {
+        self.title = title
+        self.foreground = foreground
+        self.background = background
+    }
+
     var body: some View {
         Text(title)
             .font(.system(size: 11, weight: .semibold))
