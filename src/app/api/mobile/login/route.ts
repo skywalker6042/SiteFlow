@@ -27,8 +27,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid email or password.' }, { status: 401 })
   }
 
-  if (user.platform_role === 'admin' || user.platform_role === 'support') {
-    return NextResponse.json({ error: 'Admin accounts must use the web portal at siteflo.app.' }, { status: 403 })
+  if (user.platform_role === 'support') {
+    return NextResponse.json({ error: 'Support accounts must use the web portal at siteflo.app.' }, { status: 403 })
   }
 
   await createMobileSession(user.id)

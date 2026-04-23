@@ -1,11 +1,11 @@
 import SwiftUI
 
 enum SiteFlowPalette {
-    static let ink = Color(red: 17 / 255, green: 24 / 255, blue: 39 / 255)
-    static let slate = Color(red: 107 / 255, green: 114 / 255, blue: 128 / 255)
-    static let border = Color(red: 229 / 255, green: 231 / 255, blue: 235 / 255)
-    static let background = Color(red: 249 / 255, green: 250 / 255, blue: 251 / 255)
-    static let card = Color.white
+    static let ink = Color(uiColor: .label)
+    static let slate = Color(uiColor: .secondaryLabel)
+    static let border = Color(uiColor: .separator)
+    static let background = Color(uiColor: .systemGroupedBackground)
+    static let card = Color(uiColor: .secondarySystemGroupedBackground)
     static let teal = Color(red: 20 / 255, green: 184 / 255, blue: 166 / 255)
     static let tealSoft = Color(red: 240 / 255, green: 253 / 255, blue: 250 / 255)
     static let red = Color(red: 220 / 255, green: 38 / 255, blue: 38 / 255)

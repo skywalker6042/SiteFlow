@@ -18,6 +18,16 @@ struct ClockState: Decodable {
     let logs: [ClockEntry]
     let jobs: [ClockJob]
     let workerName: String
+    let teamLogs: [TeamClockEntry]?
+}
+
+struct TeamClockEntry: Decodable, Identifiable {
+    let id: String
+    let workerName: String
+    let clockIn: String
+    let clockOut: String?
+    let jobId: String?
+    let jobName: String?
 }
 
 struct ClockView: View {
@@ -42,6 +52,9 @@ struct ClockView: View {
                     clockCard
                     if let logs = state?.logs, !logs.isEmpty {
                         todaySection(logs: logs)
+                    }
+                    if let teamLogs = state?.teamLogs, !teamLogs.isEmpty {
+                        teamSection(logs: teamLogs)
                     }
                 }
             }
@@ -212,8 +225,12 @@ struct ClockView: View {
                 open: entry,
                 logs: [entry] + (state?.logs ?? []),
                 jobs: state?.jobs ?? [],
-                workerName: state?.workerName ?? ""
+                workerName: state?.workerName ?? "",
+                teamLogs: state?.teamLogs
             )
+            if state?.teamLogs != nil {
+                await load()
+            }
             startTimer()
         } catch {
             errorMessage = error.localizedDescription
@@ -240,10 +257,55 @@ struct ClockView: View {
                 open: nil,
                 logs: (state?.logs ?? []).map { $0.id == entry.id ? entry : $0 },
                 jobs: state?.jobs ?? [],
-                workerName: state?.workerName ?? ""
+                workerName: state?.workerName ?? "",
+                teamLogs: state?.teamLogs
             )
+            if state?.teamLogs != nil {
+                await load()
+            }
         } catch {
             errorMessage = error.localizedDescription
+        }
+    }
+
+    private func teamSection(logs: [TeamClockEntry]) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            SiteFlowSectionHeader("Crew Activity")
+            SiteFlowCard {
+                ForEach(Array(logs.enumerated()), id: \.element.id) { index, log in
+                    if index > 0 { Divider() }
+                    HStack(alignment: .top) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(log.workerName)
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundStyle(SiteFlowPalette.ink)
+
+                            if let jobName = log.jobName, !jobName.isEmpty {
+                                Text(jobName)
+                                    .font(.system(size: 12))
+                                    .foregroundStyle(SiteFlowPalette.slate)
+                            }
+
+                            Text("\(formatTime(log.clockIn))\(log.clockOut != nil ? " – \(formatTime(log.clockOut!))" : "")")
+                                .font(.system(size: 12))
+                                .foregroundStyle(SiteFlowPalette.slate)
+                        }
+
+                        Spacer()
+
+                        if let out = log.clockOut {
+                            Text(duration(from: log.clockIn, to: out))
+                                .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                                .foregroundStyle(SiteFlowPalette.ink)
+                        } else {
+                            Text("Clocked In")
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundStyle(SiteFlowPalette.teal)
+                        }
+                    }
+                    .padding(.vertical, 10)
+                }
+            }
         }
     }
 

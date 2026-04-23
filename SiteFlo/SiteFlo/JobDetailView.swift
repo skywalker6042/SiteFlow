@@ -51,6 +51,7 @@ struct JobDetailView: View {
                 .refreshable { await load() }
             }
         }
+        .background(SiteFlowPalette.background.ignoresSafeArea())
         .navigationTitle(jobName)
         .navigationBarTitleDisplayMode(.inline)
         .task { @MainActor in await load() }

@@ -10,10 +10,11 @@ function unauthorized() {
 export async function GET() {
   const user = await getMobileSessionUser()
   if (!user?.id || !user.orgId) return unauthorized()
+  const isOwner = user.role === 'owner' || user.platformRole === 'admin'
 
   const today = new Date().toISOString().slice(0, 10)
 
-  const [openRows, logRows, jobRows, workerRow] = await Promise.all([
+  const [openRows, logRows, jobRows, workerRow, teamRows] = await Promise.all([
     sql`
       SELECT id, clock_in, clock_out, job_id, job_name
       FROM worker_time_logs
@@ -37,10 +38,26 @@ export async function GET() {
       WHERE om.user_id = ${user.id} AND om.org_id = ${user.orgId}
       LIMIT 1
     `,
+    isOwner ? sql`
+      SELECT id, worker_name, clock_in, clock_out, job_id, job_name
+      FROM worker_time_logs
+      WHERE company_id = ${user.orgId} AND date = ${today}
+      ORDER BY clock_in DESC
+      LIMIT 50
+    ` : Promise.resolve([]),
   ])
 
   const toEntry = (r: Record<string, unknown>) => ({
     id: r.id,
+    clockIn: (r.clock_in as Date).toISOString(),
+    clockOut: r.clock_out ? (r.clock_out as Date).toISOString() : null,
+    jobId: r.job_id ?? null,
+    jobName: r.job_name ?? null,
+  })
+
+  const toTeamEntry = (r: Record<string, unknown>) => ({
+    id: r.id,
+    workerName: r.worker_name ?? 'Unknown Worker',
     clockIn: (r.clock_in as Date).toISOString(),
     clockOut: r.clock_out ? (r.clock_out as Date).toISOString() : null,
     jobId: r.job_id ?? null,
@@ -52,6 +69,7 @@ export async function GET() {
     logs: logRows.map(r => toEntry(r as Record<string, unknown>)),
     jobs: jobRows.map(j => ({ id: j.id, name: j.name })),
     workerName: (workerRow[0] as { name?: string } | undefined)?.name ?? user.email,
+    teamLogs: teamRows.map(r => toTeamEntry(r as Record<string, unknown>)),
   })
 }
 

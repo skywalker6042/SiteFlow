@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import sql from '@/lib/db'
 import { DEFAULT_WORKER_PERMISSIONS, type UserPermissions } from '@/lib/permissions'
-import { ALL_FEATURES, DEFAULT_PLAN_FEATURES, type FeatureKey, type PlanTier } from '@/lib/plan-features'
+import { DEFAULT_PLAN_FEATURES, type FeatureKey, type PlanTier } from '@/lib/plan-features'
 import { getMobileSessionUser } from '@/lib/mobile-auth'
 
 function unauthorized() {
@@ -16,7 +16,7 @@ export async function GET() {
   const perms: UserPermissions = { ...DEFAULT_WORKER_PERMISSIONS, ...user.permissions }
   const resolvedOrgId = user.orgId
 
-  if (user.platformRole === 'admin' || !resolvedOrgId) {
+  if (!resolvedOrgId) {
     return NextResponse.json({
       user: {
         id: user.id,

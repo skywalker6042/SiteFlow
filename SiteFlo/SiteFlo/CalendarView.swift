@@ -47,6 +47,7 @@ struct CalendarView: View {
             }
             .navigationTitle("Schedule")
             .navigationBarTitleDisplayMode(.inline)
+            .background(SiteFlowPalette.background.ignoresSafeArea())
             .overlay {
                 if isLoading && workDays.isEmpty {
                     ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -200,7 +201,7 @@ private struct WeekView: View {
             }
         }
         .padding(16)
-        .background(Color.white)
+        .background(SiteFlowPalette.card)
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
     }

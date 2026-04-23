@@ -57,6 +57,14 @@ private struct MainTabView: View {
         appModel.bootstrap?.user.isOwner ?? false
     }
 
+    private var canViewFinancials: Bool {
+        (permissions?.canViewFinancials == true || isOwner) && hasFeature("financials")
+    }
+
+    private var canUseClock: Bool {
+        (appModel.bootstrap?.settings?.trackWorkerTime == true) && hasFeature("time_clock")
+    }
+
     private func hasFeature(_ feature: String) -> Bool {
         enabledFeatures.contains(feature)
     }
@@ -82,10 +90,17 @@ private struct MainTabView: View {
                     }
             }
 
-            if (permissions?.canViewCrew == true || isOwner) && hasFeature("crew") {
-                CrewView()
+            if canUseClock {
+                ClockView()
                     .tabItem {
-                        Label("Crew", systemImage: "person.3.fill")
+                        Label("Clock", systemImage: "clock.fill")
+                    }
+            } else if canViewFinancials {
+                NavigationStack {
+                    FinancialsView()
+                }
+                    .tabItem {
+                        Label("Financials", systemImage: "chart.bar.fill")
                     }
             }
 
