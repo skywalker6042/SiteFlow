@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import os from 'os'
 import { execSync } from 'child_process'
-import { readdirSync, statSync } from 'fs'
+import { existsSync, readdirSync, readFileSync, statSync } from 'fs'
 import path from 'path'
 import sql from '@/lib/db'
 import { sendAdminAlert } from '@/lib/email'
@@ -11,6 +11,7 @@ const CPU_THRESHOLD_PCT    = 80   // % of total CPU cores
 const MEMORY_THRESHOLD_PCT = 85   // % of total RAM
 const DISK_THRESHOLD_PCT   = 85   // % of total disk
 const PHOTO_THRESHOLD_GB   = 10   // GB of photo storage
+const BACKUP_MAX_AGE_HOURS = 30   // backups should never be older than this
 const COOLDOWN_MINUTES     = 60   // don't re-alert same issue within this window
 
 // Run every 15 minutes:
@@ -41,6 +42,18 @@ function getPhotoBytes() {
     }
     return total
   } catch { return 0 }
+}
+
+function getLatestBackup() {
+  try {
+    const latestPath = path.join(process.cwd(), 'backups', 'db', 'latest-backup.json')
+    if (!existsSync(latestPath)) return null
+    const raw = JSON.parse(readFileSync(latestPath, 'utf8')) as { createdAt?: string; backupFile?: string; sizeBytes?: number }
+    if (!raw.createdAt || !raw.backupFile) return null
+    return raw
+  } catch {
+    return null
+  }
 }
 
 async function isOnCooldown(key: string): Promise<boolean> {
@@ -192,7 +205,43 @@ export async function GET(req: NextRequest) {
     alerts.push('high_photo_storage')
   }
 
-  // ── 6. Expired trials ─────────────────────────────────────────────────────
+  // ── 6. Database backups ───────────────────────────────────────────────────
+  const latestBackup = getLatestBackup()
+  if (!latestBackup && !(await isOnCooldown('alert_backup_missing'))) {
+    await sendAdminAlert(
+      'Database Backup Missing',
+      '🛟',
+      `<p style="font-size:15px;color:#991b1b;">No database backup metadata was found.</p>
+       ${table(
+         row('Expected file', 'backups/db/latest-backup.json') +
+         row('Expected cadence', `less than ${BACKUP_MAX_AGE_HOURS} hours old`)
+       )}
+       <p style="font-size:13px;color:#6b7280;">Run <code>npm run db:backup</code> on the server and add it to cron.</p>`
+    )
+    await setCooldown('alert_backup_missing')
+    alerts.push('backup_missing')
+  } else if (latestBackup) {
+    const backupAgeHours = (Date.now() - new Date(latestBackup.createdAt).getTime()) / (60 * 60 * 1000)
+    if (backupAgeHours > BACKUP_MAX_AGE_HOURS && !(await isOnCooldown('alert_backup_stale'))) {
+      await sendAdminAlert(
+        'Database Backup Is Stale',
+        '🧯',
+        `<p style="font-size:15px;color:#92400e;">The latest database backup is too old.</p>
+         ${table(
+           row('Backup file', latestBackup.backupFile) +
+           row('Created at', latestBackup.createdAt) +
+           row('Age', `${backupAgeHours.toFixed(1)} hours`) +
+           row('Size', latestBackup.sizeBytes ? fmt(latestBackup.sizeBytes) : 'Unknown') +
+           row('Max allowed age', `${BACKUP_MAX_AGE_HOURS} hours`)
+         )}
+         <p style="font-size:13px;color:#6b7280;">Check that the backup cron is still running and that pg_dump is available on the server.</p>`
+      )
+      await setCooldown('alert_backup_stale')
+      alerts.push('backup_stale')
+    }
+  }
+
+  // ── 7. Expired trials ─────────────────────────────────────────────────────
   try {
     await sql`ALTER TABLE organizations ADD COLUMN IF NOT EXISTS trial_ends_at TIMESTAMPTZ`
     const expired = await sql`
@@ -203,7 +252,7 @@ export async function GET(req: NextRequest) {
         AND trial_ends_at < NOW()
     `
     if (expired.length > 0 && !(await isOnCooldown('alert_trials'))) {
-      const orgList = expired.map((o: any) =>
+      const orgList = expired.map((o: { name: string; trial_ends_at: string | Date }) =>
         row(o.name, `Expired ${new Date(o.trial_ends_at).toLocaleDateString()}`)
       ).join('')
       await sendAdminAlert(
@@ -222,7 +271,7 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.json({
     ok: true,
-    checked: ['db', 'cpu', 'memory', 'disk', 'photos', 'trials'],
+    checked: ['db', 'cpu', 'memory', 'disk', 'photos', 'backups', 'trials'],
     alerts,
     metrics: {
       dbMs,
@@ -230,6 +279,7 @@ export async function GET(req: NextRequest) {
       memPct:    parseFloat(memPct.toFixed(1)),
       diskPct:   disk ? parseFloat(disk.pct.toFixed(1)) : null,
       photoGB:   parseFloat(photoGB.toFixed(2)),
+      latestBackupAt: latestBackup?.createdAt ?? null,
     },
   })
 }
