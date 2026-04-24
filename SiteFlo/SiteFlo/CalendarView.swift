@@ -296,7 +296,7 @@ private struct MonthView: View {
                 }
             }
             .padding(12)
-            .background(Color.white)
+            .background(SiteFlowPalette.card)
             .clipShape(RoundedRectangle(cornerRadius: 16))
             .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
 

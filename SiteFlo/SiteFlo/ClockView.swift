@@ -51,16 +51,21 @@ struct ClockView: View {
     @State private var elapsedTimer: Timer?
 
     private var isClockedIn: Bool { state?.open != nil }
+    private var isOwner: Bool { appModel.bootstrap?.user.isOwner == true || appModel.bootstrap?.user.platformRole == "admin" }
 
     var body: some View {
-        SiteFlowScreen(title: "Time Clock") {
+        SiteFlowScreen(title: isOwner ? "Team Time" : "Time Clock") {
             if isLoading && state == nil {
                 ProgressView()
                     .frame(maxWidth: .infinity, minHeight: 200)
             } else {
                 VStack(spacing: 20) {
-                    clockCard
-                    if let logs = state?.logs, !logs.isEmpty {
+                    if !isOwner {
+                        clockCard
+                    } else {
+                        ownerSummaryCard
+                    }
+                    if !isOwner, let logs = state?.logs, !logs.isEmpty {
                         todaySection(logs: logs)
                     }
                     if let teamLogs = state?.teamLogs, !teamLogs.isEmpty {
@@ -156,6 +161,19 @@ struct ClockView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 14))
                 }
                 .disabled(isLoading)
+            }
+        }
+    }
+
+    private var ownerSummaryCard: some View {
+        SiteFlowCard {
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Crew time tracking")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(SiteFlowPalette.ink)
+                Text("Owners do not clock in here. This view tracks who on the team is clocked in, who is out, and recent activity.")
+                    .font(.system(size: 14))
+                    .foregroundStyle(SiteFlowPalette.slate)
             }
         }
     }

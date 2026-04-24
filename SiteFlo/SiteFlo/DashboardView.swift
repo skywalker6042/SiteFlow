@@ -44,12 +44,20 @@ struct DashboardView: View {
         let canViewFinancials = appModel.bootstrap?.user.permissions.canViewJobFinancials == true || appModel.bootstrap?.user.isOwner == true
 
         return Section("Overview") {
-            DashboardMetricRow(title: "In Progress", value: "\(dashboard?.activeCount ?? 0)", systemImage: "hammer.fill", tint: SiteFlowPalette.teal)
+            NavigationLink(destination: JobsView(initialTab: 0)) {
+                DashboardMetricRow(title: "In Progress", value: "\(dashboard?.activeCount ?? 0)", systemImage: "hammer.fill", tint: SiteFlowPalette.teal)
+            }
 
             if canViewFinancials {
-                DashboardMetricRow(title: "Outstanding", value: formatCurrency(dashboard?.totalOwed ?? 0), systemImage: "exclamationmark.circle.fill", tint: SiteFlowPalette.red)
-                DashboardMetricRow(title: "Billed", value: formatCurrency(dashboard?.totalBilled ?? 0), systemImage: "chart.line.uptrend.xyaxis", tint: SiteFlowPalette.blue)
-                DashboardMetricRow(title: "Unbilled", value: formatCurrency(dashboard?.totalUnbilled ?? 0), systemImage: "dollarsign.circle.fill", tint: SiteFlowPalette.amber)
+                NavigationLink(destination: FinancialsView()) {
+                    DashboardMetricRow(title: "Outstanding", value: formatCurrency(dashboard?.totalOwed ?? 0), systemImage: "exclamationmark.circle.fill", tint: SiteFlowPalette.red)
+                }
+                NavigationLink(destination: FinancialsView()) {
+                    DashboardMetricRow(title: "Billed", value: formatCurrency(dashboard?.totalBilled ?? 0), systemImage: "chart.line.uptrend.xyaxis", tint: SiteFlowPalette.blue)
+                }
+                NavigationLink(destination: FinancialsView()) {
+                    DashboardMetricRow(title: "Unbilled", value: formatCurrency(dashboard?.totalUnbilled ?? 0), systemImage: "dollarsign.circle.fill", tint: SiteFlowPalette.amber)
+                }
             }
         }
     }

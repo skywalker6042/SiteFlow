@@ -2,9 +2,14 @@ import SwiftUI
 
 struct JobsView: View {
     @Environment(AppModel.self) private var appModel
-    @State private var selectedTab = 0
+    @State private var selectedTab: Int
+    @State private var isPresentingEditor = false
 
     private let tabs = ["In Progress", "Backlog", "Completed"]
+
+    init(initialTab: Int = 0) {
+        _selectedTab = State(initialValue: initialTab)
+    }
 
     private var filteredJobs: [JobSummary] {
         let jobs = appModel.bootstrap?.jobs ?? []
@@ -17,6 +22,12 @@ struct JobsView: View {
         default:
             return jobs.filter { $0.status == "in_progress" }
         }
+    }
+
+    private var canEditJobs: Bool {
+        appModel.bootstrap?.user.isOwner == true
+            || appModel.bootstrap?.user.platformRole == "admin"
+            || appModel.bootstrap?.user.permissions.canEditJobs == true
     }
 
     var body: some View {
@@ -50,8 +61,22 @@ struct JobsView: View {
             .listStyle(.insetGrouped)
             .navigationTitle("Jobs")
             .navigationBarTitleDisplayMode(.large)
+            .toolbar {
+                if canEditJobs {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button {
+                            isPresentingEditor = true
+                        } label: {
+                            Image(systemName: "plus")
+                        }
+                    }
+                }
+            }
             .refreshable {
                 try? await appModel.refresh()
+            }
+            .sheet(isPresented: $isPresentingEditor) {
+                JobEditorView(job: nil, onSaved: nil)
             }
         }
     }

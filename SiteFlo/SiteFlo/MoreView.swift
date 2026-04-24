@@ -39,14 +39,26 @@ struct MoreView: View {
                     }
                 }
 
+                if isOwner && hasFeature("receipt_tracking") {
+                    NavigationLink(destination: ReceiptsView()) {
+                        Label("Receipts", systemImage: "receipt.fill")
+                    }
+                }
+
                 if (isOwner || permissions?.canViewFinancials == true) && hasFeature("financials") {
                     NavigationLink(destination: FinancialsView()) {
                         Label("Financials", systemImage: "chart.bar.fill")
                     }
                 }
 
-                NavigationLink(destination: SettingsView()) {
-                    Label("Settings", systemImage: "gearshape.fill")
+                if isOwner || isPlatformAdmin {
+                    NavigationLink(destination: SettingsView()) {
+                        Label("Settings", systemImage: "gearshape.fill")
+                    }
+                } else {
+                    NavigationLink(destination: AccountView()) {
+                        Label("Account", systemImage: "person.crop.circle")
+                    }
                 }
             }
             .navigationTitle("More")

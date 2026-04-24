@@ -61,6 +61,7 @@ export async function GET() {
         platformRole: user.platformRole,
         role: user.role,
         permissions: perms,
+        workerId: user.workerId ?? null,
       },
       org: null,
       dashboard: null,
@@ -225,6 +226,7 @@ export async function GET() {
       role: user.role,
       permissions: perms,
       isOwner,
+      workerId: user.workerId ?? null,
     },
     org: {
       name: org?.name ?? 'SiteFlo',

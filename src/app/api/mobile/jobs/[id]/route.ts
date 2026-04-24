@@ -68,6 +68,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
       amountBilled: j.amount_billed != null ? Number(j.amount_billed) : null,
       amountPaid: j.amount_paid != null ? Number(j.amount_paid) : null,
       plannedStart: j.planned_start ?? null,
+      plannedEnd: j.planned_end ?? null,
       startDate: j.start_date ?? null,
       endDate: j.end_date ?? null,
       shareToken: j.share_token ?? null,
@@ -112,5 +113,77 @@ export async function GET(_req: NextRequest, { params }: Params) {
         approved: Boolean(r.approved),
       }
     }),
+  })
+}
+
+export async function PUT(req: NextRequest, { params }: Params) {
+  const user = await getMobileSessionUser()
+  if (!user?.id || !user.orgId) return unauthorized()
+  if (user.role !== 'owner' && user.platformRole !== 'admin' && !user.permissions.can_edit_jobs) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
+
+  const { id } = await params
+  const body = await req.json() as Record<string, unknown>
+
+  const [job] = await sql`
+    UPDATE jobs SET
+      name = ${String(body.name ?? '').trim()},
+      address = ${String(body.address ?? '').trim() || null},
+      scope = ${String(body.scope ?? '').trim() || null},
+      status = ${String(body.status ?? 'not_started')},
+      percent_complete = ${Number(body.percentComplete ?? 0)},
+      total_value = ${Number(body.totalValue ?? 0)},
+      amount_billed = ${Number(body.amountBilled ?? 0)},
+      amount_paid = ${Number(body.amountPaid ?? 0)},
+      client_name = ${String(body.clientName ?? '').trim() || null},
+      client_phone = ${String(body.clientPhone ?? '').trim() || null},
+      planned_start = ${String(body.plannedStart ?? '').trim() || null},
+      planned_end = ${String(body.plannedEnd ?? '').trim() || null}
+    WHERE id = ${id} AND company_id = ${user.orgId}
+    RETURNING id, name, client_name, address, status, percent_complete, total_value, amount_paid
+  `
+
+  if (!job) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+
+  return NextResponse.json({
+    id: job.id,
+    name: job.name,
+    clientName: job.client_name ?? null,
+    address: job.address ?? null,
+    status: job.status,
+    percentComplete: Number(job.percent_complete),
+    totalValue: job.total_value != null ? Number(job.total_value) : null,
+    amountPaid: job.amount_paid != null ? Number(job.amount_paid) : null,
+  })
+}
+
+export async function PATCH(req: NextRequest, { params }: Params) {
+  const user = await getMobileSessionUser()
+  if (!user?.id || !user.orgId) return unauthorized()
+  if (user.role !== 'owner' && user.platformRole !== 'admin' && !user.permissions.can_edit_jobs) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
+
+  const { id } = await params
+  const { status } = await req.json() as { status?: string }
+  if (!status) return NextResponse.json({ error: 'Status is required' }, { status: 400 })
+
+  const [job] = await sql`
+    UPDATE jobs SET status = ${status}
+    WHERE id = ${id} AND company_id = ${user.orgId}
+    RETURNING id, name, client_name, address, status, percent_complete, total_value, amount_paid
+  `
+  if (!job) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+
+  return NextResponse.json({
+    id: job.id,
+    name: job.name,
+    clientName: job.client_name ?? null,
+    address: job.address ?? null,
+    status: job.status,
+    percentComplete: Number(job.percent_complete),
+    totalValue: job.total_value != null ? Number(job.total_value) : null,
+    amountPaid: job.amount_paid != null ? Number(job.amount_paid) : null,
   })
 }

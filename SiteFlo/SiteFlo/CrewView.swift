@@ -2,6 +2,12 @@ import SwiftUI
 
 struct CrewView: View {
     @Environment(AppModel.self) private var appModel
+    @State private var selectedWorker: WorkerSummary?
+    @State private var isAddingWorker = false
+
+    private var isOwner: Bool {
+        appModel.bootstrap?.user.isOwner == true || appModel.bootstrap?.user.platformRole == "admin"
+    }
 
     var body: some View {
         NavigationStack {
@@ -17,15 +23,39 @@ struct CrewView: View {
                     .listRowBackground(Color.clear)
                 } else {
                     ForEach(workers) { worker in
-                        WorkerRow(worker: worker)
+                        Button {
+                            if isOwner {
+                                selectedWorker = worker
+                            }
+                        } label: {
+                            WorkerRow(worker: worker)
+                        }
+                        .buttonStyle(.plain)
                     }
                 }
             }
             .listStyle(.insetGrouped)
             .navigationTitle("Crew")
             .navigationBarTitleDisplayMode(.large)
+            .toolbar {
+                if isOwner {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button {
+                            isAddingWorker = true
+                        } label: {
+                            Image(systemName: "plus")
+                        }
+                    }
+                }
+            }
             .refreshable {
                 try? await appModel.refresh()
+            }
+            .sheet(item: $selectedWorker) { worker in
+                WorkerEditorView(worker: worker)
+            }
+            .sheet(isPresented: $isAddingWorker) {
+                WorkerEditorView(worker: nil)
             }
         }
     }
@@ -93,9 +123,18 @@ private struct WorkerRow: View {
                     }
 
                     if let phone = worker.phone, !phone.isEmpty {
-                        Label(phone, systemImage: "phone")
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
+                        let digits = phone.filter { $0.isNumber }
+                        if let url = URL(string: "tel:\(digits)"), !digits.isEmpty {
+                            Link(destination: url) {
+                                Label(phone, systemImage: "phone")
+                                    .font(.footnote)
+                                    .foregroundStyle(SiteFlowPalette.teal)
+                            }
+                        } else {
+                            Label(phone, systemImage: "phone")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                        }
                     }
                 }
             }
@@ -119,6 +158,99 @@ private struct FlexibleTagCloud: View {
                     .background(SiteFlowPalette.tealSoft)
                     .clipShape(Capsule())
             }
+        }
+    }
+}
+
+private struct WorkerEditorView: View {
+    @Environment(AppModel.self) private var appModel
+    @Environment(\.dismiss) private var dismiss
+
+    let worker: WorkerSummary?
+
+    @State private var name: String = ""
+    @State private var phone: String = ""
+    @State private var role: String = ""
+    @State private var isSaving = false
+    @State private var errorMessage: String?
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("Worker") {
+                    TextField("Name", text: $name)
+                    TextField("Phone", text: $phone)
+                        .keyboardType(.phonePad)
+                    TextField("Role / Title", text: $role)
+                }
+
+                if let errorMessage {
+                    Section {
+                        Text(errorMessage)
+                            .font(.footnote)
+                            .foregroundStyle(SiteFlowPalette.red)
+                    }
+                }
+            }
+            .navigationTitle(worker == nil ? "Add Worker" : "Edit Worker")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save") {
+                        Task { @MainActor in
+                            await save()
+                        }
+                    }
+                    .disabled(isSaving || name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }
+            }
+            .task {
+                name = worker?.name ?? ""
+                phone = worker?.phone ?? ""
+                role = worker?.role ?? ""
+            }
+        }
+    }
+
+    private func save() async {
+        guard let baseURL = appModel.serverURL else { return }
+        isSaving = true
+        errorMessage = nil
+        defer { isSaving = false }
+
+        do {
+            let payload = [
+                "name": name,
+                "phone": phone,
+                "role": role,
+            ]
+
+            let url: URL
+            let method: String
+            if let worker {
+                url = baseURL.appendingPathComponent("/api/mobile/workers/\(worker.id)")
+                method = "PATCH"
+            } else {
+                url = baseURL.appendingPathComponent("/api/mobile/workers")
+                method = "POST"
+            }
+
+            var request = URLRequest(url: url)
+            request.httpMethod = method
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.httpBody = try JSONEncoder().encode(payload)
+            let (_, response) = try await URLSession.shared.data(for: request)
+            guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
+                throw SiteFlowAPIError.invalidResponse
+            }
+
+            try? await appModel.refresh()
+            dismiss()
+        } catch {
+            errorMessage = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
         }
     }
 }

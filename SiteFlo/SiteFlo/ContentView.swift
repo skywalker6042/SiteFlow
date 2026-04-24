@@ -71,6 +71,10 @@ private struct MainTabView: View {
         (appModel.bootstrap?.settings?.trackWorkerTime == true) && hasFeature("time_clock")
     }
 
+    private var clockTabLabel: String {
+        isOwner || appModel.bootstrap?.user.platformRole == "admin" ? "Team Time" : "Clock"
+    }
+
     private func hasFeature(_ feature: String) -> Bool {
         enabledFeatures.contains(feature)
     }
@@ -99,7 +103,7 @@ private struct MainTabView: View {
             if canUseClock {
                 ClockView()
                     .tabItem {
-                        Label("Clock", systemImage: "clock.fill")
+                        Label(clockTabLabel, systemImage: "clock.fill")
                     }
             } else if canViewFinancials {
                 NavigationStack {

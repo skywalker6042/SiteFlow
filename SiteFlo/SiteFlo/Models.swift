@@ -18,6 +18,7 @@ struct SessionUser: Decodable {
     let role: String?
     let permissions: Permissions
     let isOwner: Bool?
+    let workerId: String?
 }
 
 struct Permissions: Decodable {
@@ -183,6 +184,7 @@ struct JobDetailInfo: Decodable {
     let amountBilled: Double?
     let amountPaid: Double?
     let plannedStart: String?
+    let plannedEnd: String?
     let startDate: String?
     let endDate: String?
     let shareToken: String?

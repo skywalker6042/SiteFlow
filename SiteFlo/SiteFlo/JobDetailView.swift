@@ -10,6 +10,7 @@ struct JobDetailView: View {
     @State private var isLoading = false
     @State private var selectedTab = 0
     @State private var errorMessage: String?
+    @State private var isPresentingEditor = false
 
     private var isOwner: Bool { appModel.bootstrap?.user.isOwner ?? false }
     private var permissions: Permissions? { appModel.bootstrap?.user.permissions }
@@ -17,6 +18,7 @@ struct JobDetailView: View {
     private var canCompleteTasks: Bool { isOwner || permissions?.canCompleteTasks == true }
     private var canViewFinancials: Bool { isOwner || permissions?.canViewJobFinancials == true }
     private var canUploadPhotos: Bool { isOwner || permissions?.canUploadPhotos == true }
+    private var canEditJob: Bool { isOwner || appModel.bootstrap?.user.platformRole == "admin" || permissions?.canEditJobs == true }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -54,6 +56,20 @@ struct JobDetailView: View {
         .background(SiteFlowPalette.background.ignoresSafeArea())
         .navigationTitle(jobName)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            if canEditJob, let detail {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Edit") {
+                        isPresentingEditor = true
+                    }
+                }
+            }
+        }
+        .sheet(isPresented: $isPresentingEditor) {
+            if let detail {
+                JobEditorView(job: detail.job, onSaved: reload)
+            }
+        }
         .task { @MainActor in await load() }
     }
 
