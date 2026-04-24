@@ -426,9 +426,11 @@ private struct PhotosTab: View {
 private struct PhotoTile: View {
     let url: URL
 
+    private let cornerRadius: CGFloat = 8
+
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 8)
+            RoundedRectangle(cornerRadius: cornerRadius)
                 .fill(SiteFlowPalette.border.opacity(0.35))
 
             AsyncImage(url: url) { phase in
@@ -437,6 +439,8 @@ private struct PhotoTile: View {
                     image
                         .resizable()
                         .scaledToFill()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .clipped()
                 case .empty:
                     ProgressView()
                         .tint(SiteFlowPalette.teal)
@@ -449,8 +453,8 @@ private struct PhotoTile: View {
         }
         .frame(maxWidth: .infinity)
         .aspectRatio(1, contentMode: .fit)
-        .clipShape(RoundedRectangle(cornerRadius: 8))
-        .contentShape(RoundedRectangle(cornerRadius: 8))
+        .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+        .contentShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
     }
 }
 
