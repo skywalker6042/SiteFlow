@@ -5,6 +5,28 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 The canonical iOS project lives in `SiteFlo/SiteFlo.xcodeproj`, and the app source files live in `SiteFlo/SiteFlo/`.
 Open that Xcode project when working on the iOS build.
 
+## Ollama
+
+This repo can talk to a local Ollama server through `src/app/api/ai/ollama/route.ts`.
+
+Set these in your local environment if needed:
+
+```bash
+OLLAMA_BASE_URL=http://127.0.0.1:11434
+OLLAMA_MODEL=llama3.1:8b
+```
+
+Example checks:
+
+```bash
+npm run ai:ollama:pull
+npm run ai:ollama:check
+curl http://localhost:3000/api/ai/ollama
+curl -X POST http://localhost:3000/api/ai/ollama \
+  -H 'Content-Type: application/json' \
+  -d '{"prompt":"Summarize this job update for the owner."}'
+```
+
 ## Getting Started
 
 First, run the development server:

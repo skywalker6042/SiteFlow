@@ -44,13 +44,28 @@ function getPhotoBytes() {
   } catch { return 0 }
 }
 
-function getLatestBackup() {
+type LatestBackupMetadata = {
+  createdAt: string
+  backupFile: string
+  sizeBytes?: number
+}
+
+type ExpiredTrialRow = {
+  name: string
+  trial_ends_at: string | Date
+}
+
+function getLatestBackup(): LatestBackupMetadata | null {
   try {
     const latestPath = path.join(process.cwd(), 'backups', 'db', 'latest-backup.json')
     if (!existsSync(latestPath)) return null
-    const raw = JSON.parse(readFileSync(latestPath, 'utf8')) as { createdAt?: string; backupFile?: string; sizeBytes?: number }
+    const raw = JSON.parse(readFileSync(latestPath, 'utf8')) as Partial<LatestBackupMetadata>
     if (!raw.createdAt || !raw.backupFile) return null
-    return raw
+    return {
+      createdAt: raw.createdAt,
+      backupFile: raw.backupFile,
+      sizeBytes: raw.sizeBytes,
+    }
   } catch {
     return null
   }
@@ -244,7 +259,7 @@ export async function GET(req: NextRequest) {
   // ── 7. Expired trials ─────────────────────────────────────────────────────
   try {
     await sql`ALTER TABLE organizations ADD COLUMN IF NOT EXISTS trial_ends_at TIMESTAMPTZ`
-    const expired = await sql`
+    const expired = await sql<ExpiredTrialRow[]>`
       SELECT name, trial_ends_at
       FROM organizations
       WHERE status = 'trial'
@@ -252,7 +267,7 @@ export async function GET(req: NextRequest) {
         AND trial_ends_at < NOW()
     `
     if (expired.length > 0 && !(await isOnCooldown('alert_trials'))) {
-      const orgList = expired.map((o: { name: string; trial_ends_at: string | Date }) =>
+      const orgList = expired.map((o) =>
         row(o.name, `Expired ${new Date(o.trial_ends_at).toLocaleDateString()}`)
       ).join('')
       await sendAdminAlert(

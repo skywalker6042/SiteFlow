@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "db:backup": "./scripts/backup-db.sh",
-    "db:restore": "./scripts/restore-db.sh"
+    "db:restore": "./scripts/restore-db.sh",
+    "ai:ollama:check": "curl -s http://127.0.0.1:11434/api/tags",
+    "ai:ollama:pull": "./scripts/ollama-pull-model.sh"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",
