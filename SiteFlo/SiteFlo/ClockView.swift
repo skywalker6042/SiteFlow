@@ -19,6 +19,7 @@ struct ClockState: Decodable {
     let jobs: [ClockJob]
     let workerName: String
     let teamLogs: [TeamClockEntry]?
+    let teamStatus: [TeamClockStatus]?
 }
 
 struct TeamClockEntry: Decodable, Identifiable {
@@ -27,6 +28,15 @@ struct TeamClockEntry: Decodable, Identifiable {
     let clockIn: String
     let clockOut: String?
     let jobId: String?
+    let jobName: String?
+}
+
+struct TeamClockStatus: Decodable, Identifiable {
+    let id: String
+    let workerName: String
+    let isClockedIn: Bool
+    let clockIn: String?
+    let clockOut: String?
     let jobName: String?
 }
 
@@ -55,6 +65,9 @@ struct ClockView: View {
                     }
                     if let teamLogs = state?.teamLogs, !teamLogs.isEmpty {
                         teamSection(logs: teamLogs)
+                    }
+                    if let teamStatus = state?.teamStatus, !teamStatus.isEmpty {
+                        rosterSection(statuses: teamStatus)
                     }
                 }
             }
@@ -226,7 +239,8 @@ struct ClockView: View {
                 logs: [entry] + (state?.logs ?? []),
                 jobs: state?.jobs ?? [],
                 workerName: state?.workerName ?? "",
-                teamLogs: state?.teamLogs
+                teamLogs: state?.teamLogs,
+                teamStatus: state?.teamStatus
             )
             if state?.teamLogs != nil {
                 await load()
@@ -258,7 +272,8 @@ struct ClockView: View {
                 logs: (state?.logs ?? []).map { $0.id == entry.id ? entry : $0 },
                 jobs: state?.jobs ?? [],
                 workerName: state?.workerName ?? "",
-                teamLogs: state?.teamLogs
+                teamLogs: state?.teamLogs,
+                teamStatus: state?.teamStatus
             )
             if state?.teamLogs != nil {
                 await load()
@@ -302,6 +317,51 @@ struct ClockView: View {
                                 .font(.system(size: 12, weight: .semibold))
                                 .foregroundStyle(SiteFlowPalette.teal)
                         }
+                    }
+                    .padding(.vertical, 10)
+                }
+            }
+        }
+    }
+
+    private func rosterSection(statuses: [TeamClockStatus]) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            SiteFlowSectionHeader("Who Is Clocked In")
+            SiteFlowCard {
+                ForEach(Array(statuses.enumerated()), id: \.element.id) { index, status in
+                    if index > 0 { Divider() }
+                    HStack(alignment: .top) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(status.workerName)
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundStyle(SiteFlowPalette.ink)
+
+                            if let jobName = status.jobName, !jobName.isEmpty {
+                                Text(jobName)
+                                    .font(.system(size: 12))
+                                    .foregroundStyle(SiteFlowPalette.slate)
+                            }
+
+                            if let clockIn = status.clockIn {
+                                Text(status.isClockedIn ? "In since \(formatTime(clockIn))" : "Last out \(status.clockOut.map(formatTime) ?? formatTime(clockIn))")
+                                    .font(.system(size: 12))
+                                    .foregroundStyle(SiteFlowPalette.slate)
+                            } else {
+                                Text("No time logged today")
+                                    .font(.system(size: 12))
+                                    .foregroundStyle(SiteFlowPalette.slate)
+                            }
+                        }
+
+                        Spacer()
+
+                        Text(status.isClockedIn ? "Clocked In" : "Not Clocked In")
+                            .font(.system(size: 11, weight: .semibold))
+                            .foregroundStyle(status.isClockedIn ? SiteFlowPalette.teal : SiteFlowPalette.slate)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .background((status.isClockedIn ? SiteFlowPalette.teal : SiteFlowPalette.border).opacity(0.12))
+                            .clipShape(Capsule())
                     }
                     .padding(.vertical, 10)
                 }

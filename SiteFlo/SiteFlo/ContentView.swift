@@ -14,7 +14,13 @@ struct ContentView: View {
             case .signedOut:
                 LoginView()
             case .signedIn:
-                MainTabView()
+                if appModel.bootstrap?.user.platformRole == "admin",
+                   appModel.bootstrap?.org == nil,
+                   appModel.bootstrap?.adminPortal != nil {
+                    AdminPortalView()
+                } else {
+                    MainTabView()
+                }
             }
         }
     }

@@ -17,6 +17,43 @@ export async function GET() {
   const resolvedOrgId = user.orgId
 
   if (!resolvedOrgId) {
+    const adminPortal = user.platformRole === 'admin'
+      ? await (async () => {
+          const orgs = await sql`
+            SELECT
+              o.id,
+              o.name,
+              o.status,
+              o.plan,
+              COUNT(DISTINCT om.id)::int AS member_count,
+              COUNT(DISTINCT j.id)::int AS job_count
+            FROM organizations o
+            LEFT JOIN org_members om ON om.org_id = o.id
+            LEFT JOIN jobs j ON j.company_id = o.id
+            GROUP BY o.id
+            ORDER BY o.created_at DESC
+            LIMIT 50
+          `
+
+          return {
+            counts: {
+              total: orgs.length,
+              active: orgs.filter((org) => org.status === 'active').length,
+              trial: orgs.filter((org) => org.status === 'trial').length,
+              suspended: orgs.filter((org) => org.status === 'suspended').length,
+            },
+            orgs: orgs.map((org) => ({
+              id: org.id,
+              name: org.name,
+              status: org.status,
+              plan: org.plan ?? 'trial',
+              memberCount: Number(org.member_count ?? 0),
+              jobCount: Number(org.job_count ?? 0),
+            })),
+          }
+        })()
+      : null
+
     return NextResponse.json({
       user: {
         id: user.id,
@@ -31,6 +68,7 @@ export async function GET() {
       workers: [],
       calendar: { year: new Date().getFullYear(), month: new Date().getMonth() + 1, workDays: [] },
       settings: null,
+      adminPortal,
     })
   }
 
@@ -220,5 +258,6 @@ export async function GET() {
       trackWorkerTime: !!org?.track_worker_time,
       trackWorkerJob: !!org?.track_worker_job,
     },
+    adminPortal: null,
   })
 }

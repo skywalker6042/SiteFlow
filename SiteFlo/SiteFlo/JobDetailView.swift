@@ -370,20 +370,7 @@ private struct PhotosTab: View {
                 LazyVGrid(columns: columns, spacing: 4) {
                     ForEach(detail.photos) { photo in
                         if let url = photoURL(photo.storagePath) {
-                            AsyncImage(url: url) { phase in
-                                switch phase {
-                                case .success(let image):
-                                    image.resizable().scaledToFill()
-                                        .frame(minWidth: 0, maxWidth: .infinity)
-                                        .aspectRatio(1, contentMode: .fill)
-                                        .clipped()
-                                default:
-                                    Rectangle()
-                                        .fill(SiteFlowPalette.border)
-                                        .aspectRatio(1, contentMode: .fit)
-                                }
-                            }
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                            PhotoTile(url: url)
                         }
                     }
                 }
@@ -417,6 +404,37 @@ private struct PhotosTab: View {
             _ = try? await URLSession.shared.data(for: req)
         }
         onUploaded()
+    }
+}
+
+private struct PhotoTile: View {
+    let url: URL
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 8)
+                .fill(SiteFlowPalette.border.opacity(0.35))
+
+            AsyncImage(url: url) { phase in
+                switch phase {
+                case .success(let image):
+                    image
+                        .resizable()
+                        .scaledToFill()
+                case .empty:
+                    ProgressView()
+                        .tint(SiteFlowPalette.teal)
+                default:
+                    Image(systemName: "photo")
+                        .font(.system(size: 20, weight: .medium))
+                        .foregroundStyle(SiteFlowPalette.slate)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .aspectRatio(1, contentMode: .fit)
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .contentShape(RoundedRectangle(cornerRadius: 8))
     }
 }
 

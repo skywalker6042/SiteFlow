@@ -14,7 +14,7 @@ export async function GET() {
 
   const today = new Date().toISOString().slice(0, 10)
 
-  const [openRows, logRows, jobRows, workerRow, teamRows] = await Promise.all([
+  const [openRows, logRows, jobRows, workerRow, teamRows, teamStatusRows] = await Promise.all([
     sql`
       SELECT id, clock_in, clock_out, job_id, job_name
       FROM worker_time_logs
@@ -45,6 +45,26 @@ export async function GET() {
       ORDER BY clock_in DESC
       LIMIT 50
     ` : Promise.resolve([]),
+    isOwner ? sql`
+      SELECT
+        w.id,
+        w.name AS worker_name,
+        latest.clock_in,
+        latest.clock_out,
+        latest.job_name
+      FROM workers w
+      LEFT JOIN LATERAL (
+        SELECT clock_in, clock_out, job_name
+        FROM worker_time_logs
+        WHERE company_id = ${user.orgId}
+          AND worker_name = w.name
+          AND date = ${today}
+        ORDER BY clock_in DESC
+        LIMIT 1
+      ) latest ON TRUE
+      WHERE w.company_id = ${user.orgId}
+      ORDER BY w.name ASC
+    ` : Promise.resolve([]),
   ])
 
   const toEntry = (r: Record<string, unknown>) => ({
@@ -64,12 +84,22 @@ export async function GET() {
     jobName: r.job_name ?? null,
   })
 
+  const toTeamStatus = (r: Record<string, unknown>) => ({
+    id: r.id,
+    workerName: r.worker_name ?? 'Unknown Worker',
+    isClockedIn: !!r.clock_in && !r.clock_out,
+    clockIn: r.clock_in ? (r.clock_in as Date).toISOString() : null,
+    clockOut: r.clock_out ? (r.clock_out as Date).toISOString() : null,
+    jobName: r.job_name ?? null,
+  })
+
   return NextResponse.json({
     open: openRows[0] ? toEntry(openRows[0] as Record<string, unknown>) : null,
     logs: logRows.map(r => toEntry(r as Record<string, unknown>)),
     jobs: jobRows.map(j => ({ id: j.id, name: j.name })),
     workerName: (workerRow[0] as { name?: string } | undefined)?.name ?? user.email,
     teamLogs: teamRows.map(r => toTeamEntry(r as Record<string, unknown>)),
+    teamStatus: teamStatusRows.map(r => toTeamStatus(r as Record<string, unknown>)),
   })
 }
 

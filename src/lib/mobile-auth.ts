@@ -3,6 +3,7 @@ import { randomBytes, createHash } from 'crypto'
 import sql from '@/lib/db'
 import type { AppUser } from '@/lib/auth'
 import type { UserPermissions } from '@/lib/permissions'
+import { ACTIVE_ORG_COOKIE } from '@/lib/auth-context'
 
 const MOBILE_SESSION_COOKIE = 'siteflow_mobile_session'
 const MOBILE_SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 30
@@ -106,11 +107,16 @@ export async function getMobileSessionUser(): Promise<AppUser | null> {
     return null
   }
 
+  let effectiveOrgId: string | null = row.org_id ?? null
+  if (row.platform_role === 'admin') {
+    effectiveOrgId = cookieStore.get(ACTIVE_ORG_COOKIE)?.value ?? null
+  }
+
   return {
     id: row.user_id,
     email: row.email,
     platformRole: row.platform_role,
-    orgId: row.org_id ?? null,
+    orgId: effectiveOrgId,
     role: row.role ?? null,
     permissions: (typeof row.permissions === 'string' ? JSON.parse(row.permissions) : (row.permissions ?? {})) as UserPermissions,
     workerId: row.worker_id ?? null,

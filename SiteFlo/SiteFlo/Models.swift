@@ -8,6 +8,7 @@ struct BootstrapResponse: Decodable {
     let workers: [WorkerSummary]
     let calendar: CalendarPayload
     let settings: SettingsPayload?
+    let adminPortal: AdminPortalPayload?
 }
 
 struct SessionUser: Decodable {
@@ -136,6 +137,27 @@ struct SettingsPayload: Decodable {
     let requireSignature: Bool
     let trackWorkerTime: Bool
     let trackWorkerJob: Bool
+}
+
+struct AdminPortalPayload: Decodable {
+    let counts: AdminPortalCounts
+    let orgs: [AdminPortalOrg]
+}
+
+struct AdminPortalCounts: Decodable {
+    let total: Int
+    let active: Int
+    let trial: Int
+    let suspended: Int
+}
+
+struct AdminPortalOrg: Decodable, Identifiable {
+    let id: String
+    let name: String
+    let status: String
+    let plan: String
+    let memberCount: Int
+    let jobCount: Int
 }
 
 // MARK: - Job Detail
