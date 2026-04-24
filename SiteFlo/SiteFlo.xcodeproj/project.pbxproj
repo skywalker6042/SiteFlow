@@ -256,6 +256,7 @@
 				DEVELOPMENT_TEAM = DBVS9Y457L;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
 				INFOPLIST_KEY_NSCameraUsageDescription = "SiteFlo uses the camera so you can upload job photos and receipts.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "SiteFlo uses your photo library so you can attach job photos and receipts.";
@@ -293,6 +294,7 @@
 				DEVELOPMENT_TEAM = DBVS9Y457L;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
 				INFOPLIST_KEY_NSCameraUsageDescription = "SiteFlo uses the camera so you can upload job photos and receipts.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "SiteFlo uses your photo library so you can attach job photos and receipts.";
