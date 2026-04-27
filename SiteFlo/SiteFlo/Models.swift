@@ -138,6 +138,27 @@ struct SettingsPayload: Decodable {
     let requireSignature: Bool
     let trackWorkerTime: Bool
     let trackWorkerJob: Bool
+    let financialIncludeLabor: Bool
+    let financialIncludeReceipts: Bool
+    let financialIncludeChangeOrders: Bool
+    let financialShowLaborBreakdown: Bool
+    let financialShowReceiptBreakdown: Bool
+}
+
+struct MobileFinancialSettings: Decodable {
+    let includeLabor: Bool
+    let includeReceipts: Bool
+    let includeChangeOrders: Bool
+    let showLaborBreakdown: Bool
+    let showReceiptBreakdown: Bool
+}
+
+struct MobileReceiptCategory: Decodable, Identifiable {
+    let category: String
+    let count: Int
+    let total: Double
+
+    var id: String { category }
 }
 
 struct AdminPortalPayload: Decodable {

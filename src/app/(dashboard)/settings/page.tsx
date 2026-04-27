@@ -5,7 +5,8 @@ import { SpecialtyManager } from '@/components/settings/SpecialtyManager'
 import { RoleManager } from '@/components/settings/RoleManager'
 import { LogoUpload } from '@/components/settings/LogoUpload'
 import { CompanyProfile } from '@/components/settings/CompanyProfile'
-import { OrgSettings, CrewSettings } from '@/components/settings/OrgSettings'
+import { OrgSettings, CrewSettings, FinancialSettings } from '@/components/settings/OrgSettings'
+import { ensureFinancialSettingsColumns, readFinancialSettings } from '@/lib/financial-settings'
 import type { Specialty, OrgRole } from '@/types'
 
 export const dynamic = 'force-dynamic'
@@ -36,9 +37,18 @@ export default async function SettingsPage() {
     ADD COLUMN IF NOT EXISTS track_worker_time   BOOLEAN NOT NULL DEFAULT false,
     ADD COLUMN IF NOT EXISTS track_worker_job    BOOLEAN NOT NULL DEFAULT false
   `
+  await ensureFinancialSettingsColumns()
 
   const [[org], specialties, roles] = await Promise.all([
-    sql`SELECT name, logo_url, phone, co_separate_invoice, require_signature, track_worker_time, track_worker_job FROM organizations WHERE id = ${orgId}`,
+    sql`
+      SELECT
+        name, logo_url, phone,
+        co_separate_invoice, require_signature, track_worker_time, track_worker_job,
+        financial_include_labor, financial_include_receipts, financial_include_change_orders,
+        financial_show_labor_breakdown, financial_show_receipt_breakdown
+      FROM organizations
+      WHERE id = ${orgId}
+    `,
     sql`SELECT * FROM specialties WHERE company_id = ${orgId} ORDER BY name` as unknown as Promise<Specialty[]>,
     sql`SELECT * FROM org_roles WHERE org_id = ${orgId} ORDER BY name` as unknown as Promise<OrgRole[]>,
   ])
@@ -49,6 +59,7 @@ export default async function SettingsPage() {
     track_worker_time:   org?.track_worker_time   ?? false,
     track_worker_job:    org?.track_worker_job     ?? false,
   }
+  const financialSettings = readFinancialSettings(org)
 
   return (
     <div className="flex flex-col gap-5">
@@ -88,6 +99,18 @@ export default async function SettingsPage() {
         </CardHeader>
         <CardBody>
           <CrewSettings initial={orgSettings} />
+        </CardBody>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <div>
+            <span className="text-sm font-semibold text-gray-700">Financial Rules</span>
+            <p className="text-xs text-gray-400 mt-0.5">Choose what counts toward revenue, costs, and detail sections in financial reporting.</p>
+          </div>
+        </CardHeader>
+        <CardBody>
+          <FinancialSettings initial={financialSettings} />
         </CardBody>
       </Card>
 

@@ -3,6 +3,7 @@ import sql from '@/lib/db'
 import { DEFAULT_WORKER_PERMISSIONS, type UserPermissions } from '@/lib/permissions'
 import { DEFAULT_PLAN_FEATURES, type FeatureKey, type PlanTier } from '@/lib/plan-features'
 import { getMobileSessionUser } from '@/lib/mobile-auth'
+import { ensureFinancialSettingsColumns, readFinancialSettings } from '@/lib/financial-settings'
 
 function unauthorized() {
   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -11,6 +12,7 @@ function unauthorized() {
 export async function GET() {
   const user = await getMobileSessionUser()
   if (!user) return unauthorized()
+  await ensureFinancialSettingsColumns()
 
   const isOwner = user.role === 'owner' || user.platformRole === 'admin'
   const perms: UserPermissions = { ...DEFAULT_WORKER_PERMISSIONS, ...user.permissions }
@@ -92,6 +94,11 @@ export async function GET() {
         co_separate_invoice,
         require_signature,
         track_worker_job,
+        financial_include_labor,
+        financial_include_receipts,
+        financial_include_change_orders,
+        financial_show_labor_breakdown,
+        financial_show_receipt_breakdown,
         plan
       FROM organizations
       WHERE id = ${resolvedOrgId}
@@ -210,6 +217,7 @@ export async function GET() {
   })
 
   const org = orgRows[0]
+  const financialSettings = readFinancialSettings(org)
   const kpis = kpiRows[0] ?? {}
   const plan = ((org?.plan ?? 'trial') as PlanTier)
   const planFeatureRows = await sql`SELECT value FROM platform_settings WHERE key = ${'plan_features_' + plan}` as Array<{ value: string }>
@@ -259,6 +267,11 @@ export async function GET() {
       requireSignature: !!org?.require_signature,
       trackWorkerTime: !!org?.track_worker_time,
       trackWorkerJob: !!org?.track_worker_job,
+      financialIncludeLabor: financialSettings.financial_include_labor,
+      financialIncludeReceipts: financialSettings.financial_include_receipts,
+      financialIncludeChangeOrders: financialSettings.financial_include_change_orders,
+      financialShowLaborBreakdown: financialSettings.financial_show_labor_breakdown,
+      financialShowReceiptBreakdown: financialSettings.financial_show_receipt_breakdown,
     },
     adminPortal: null,
   })

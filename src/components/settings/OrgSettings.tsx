@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import type { FinancialSettings as FinancialSettingsState } from '@/lib/financial-settings'
 
 interface OrgSettingsProps {
   initial: {
@@ -36,6 +37,10 @@ function Row({ label, description, checked, onChange, disabled }: {
       <Toggle checked={checked} onChange={onChange} disabled={disabled} />
     </div>
   )
+}
+
+interface FinancialSettingsProps {
+  initial: FinancialSettingsState
 }
 
 export function OrgSettings({ initial }: OrgSettingsProps) {
@@ -109,6 +114,65 @@ export function CrewSettings({ initial }: OrgSettingsProps) {
         checked={settings.track_worker_job}
         onChange={v => update('track_worker_job', v)}
         disabled={!settings.track_worker_time || saving === 'track_worker_job'}
+      />
+    </div>
+  )
+}
+
+export function FinancialSettings({ initial }: FinancialSettingsProps) {
+  const [settings, setSettings] = useState(initial)
+  const [saving, setSaving] = useState<string | null>(null)
+
+  async function update(key: keyof typeof settings, value: boolean) {
+    setSaving(key)
+    const res = await fetch('/api/org/settings', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ [key]: value }),
+    })
+    if (res.ok) {
+      const data = await res.json()
+      setSettings((s) => ({ ...s, ...data }))
+    }
+    setSaving(null)
+  }
+
+  return (
+    <div className="divide-y divide-gray-100">
+      <Row
+        label="Include labor in profitability"
+        description="Labor hours and hourly rates count toward tracked costs, margin, and cost charts."
+        checked={settings.financial_include_labor}
+        onChange={(v) => update('financial_include_labor', v)}
+        disabled={saving === 'financial_include_labor'}
+      />
+      <Row
+        label="Include receipts in profitability"
+        description="Receipt totals count toward tracked costs. Turn this off if you want receipts stored but excluded from financial reporting."
+        checked={settings.financial_include_receipts}
+        onChange={(v) => update('financial_include_receipts', v)}
+        disabled={saving === 'financial_include_receipts'}
+      />
+      <Row
+        label="Include approved change orders in revenue"
+        description="Approved change orders are added to sold work, outstanding balances, and pipeline value."
+        checked={settings.financial_include_change_orders}
+        onChange={(v) => update('financial_include_change_orders', v)}
+        disabled={saving === 'financial_include_change_orders'}
+      />
+      <Row
+        label="Show labor breakdown"
+        description="Display the worker hours and labor detail section on the financials page."
+        checked={settings.financial_show_labor_breakdown}
+        onChange={(v) => update('financial_show_labor_breakdown', v)}
+        disabled={saving === 'financial_show_labor_breakdown'}
+      />
+      <Row
+        label="Show receipt breakdown"
+        description="Display receipt totals and top receipt categories on the financials page."
+        checked={settings.financial_show_receipt_breakdown}
+        onChange={(v) => update('financial_show_receipt_breakdown', v)}
+        disabled={saving === 'financial_show_receipt_breakdown'}
       />
     </div>
   )

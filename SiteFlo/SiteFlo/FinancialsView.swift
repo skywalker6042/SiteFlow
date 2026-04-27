@@ -5,6 +5,12 @@ struct FinancialsMonth: Decodable, Identifiable {
     let contracted: Double
     let billed: Double
     let collected: Double
+    let changeOrders: Double
+    let laborCost: Double
+    let laborHours: Double
+    let receipts: Double
+    let trackedCosts: Double
+    let netCollected: Double
 
     var id: Int { month }
 }
@@ -18,6 +24,12 @@ struct FinancialsSummary: Decodable {
     let jobsDone: Int
     let jobsActive: Int
     let jobsPending: Int
+    let trackedCosts: Double
+    let estimatedNet: Double
+    let laborCost: Double
+    let laborHours: Double
+    let receiptTotal: Double
+    let approvedChangeOrders: Double
 }
 
 struct FinancialsJob: Decodable, Identifiable {
@@ -34,8 +46,10 @@ struct FinancialsJob: Decodable, Identifiable {
 
 struct FinancialsSnapshot: Decodable {
     let year: Int
+    let settings: MobileFinancialSettings
     let summary: FinancialsSummary
     let months: [FinancialsMonth]
+    let receiptCategories: [MobileReceiptCategory]
     let outstandingJobs: [FinancialsJob]
 }
 
@@ -53,8 +67,18 @@ struct FinancialsView: View {
                     .frame(maxWidth: .infinity, minHeight: 220)
             } else if let snapshot {
                 VStack(spacing: 18) {
+                    rulesCard(snapshot.settings)
                     summaryGrid(snapshot.summary)
-                    monthlyCollection(snapshot.months, year: snapshot.year)
+                    monthlyCollection(snapshot.months, year: snapshot.year, settings: snapshot.settings)
+
+                    if snapshot.settings.showLaborBreakdown, snapshot.summary.laborCost > 0 {
+                        laborSection(snapshot.summary)
+                    }
+
+                    if snapshot.settings.showReceiptBreakdown, snapshot.summary.receiptTotal > 0 {
+                        receiptSection(total: snapshot.summary.receiptTotal, categories: snapshot.receiptCategories, included: snapshot.settings.includeReceipts)
+                    }
+
                     outstandingSection(snapshot.outstandingJobs)
                 }
             } else if let errorMessage {
@@ -75,6 +99,21 @@ struct FinancialsView: View {
         .refreshable { await load() }
     }
 
+    private func rulesCard(_ settings: MobileFinancialSettings) -> some View {
+        SiteFlowCard {
+            SiteFlowSectionHeader("Financial Rules")
+            ruleRow(title: "Revenue Includes", values: [
+                "Base contract",
+                settings.includeChangeOrders ? "Approved change orders" : "Change orders excluded"
+            ])
+            Divider()
+            ruleRow(title: "Tracked Costs", values: [
+                settings.includeLabor ? "Labor" : "Labor excluded",
+                settings.includeReceipts ? "Receipts" : "Receipts excluded"
+            ])
+        }
+    }
+
     private func summaryGrid(_ summary: FinancialsSummary) -> some View {
         VStack(spacing: 12) {
             HStack(spacing: 12) {
@@ -85,6 +124,11 @@ struct FinancialsView: View {
             HStack(spacing: 12) {
                 metricCard(title: "Outstanding", value: formatCurrency(summary.outstanding), tint: summary.outstanding > 0 ? SiteFlowPalette.amber : SiteFlowPalette.teal)
                 metricCard(title: "Unbilled", value: formatCurrency(summary.unbilled), tint: summary.unbilled > 0 ? SiteFlowPalette.blue : SiteFlowPalette.teal)
+            }
+
+            HStack(spacing: 12) {
+                metricCard(title: "Tracked Costs", value: formatCurrency(summary.trackedCosts), tint: summary.trackedCosts > 0 ? SiteFlowPalette.amber : SiteFlowPalette.ink)
+                metricCard(title: "Net Collected", value: formatCurrency(summary.estimatedNet), tint: summary.estimatedNet >= 0 ? SiteFlowPalette.teal : SiteFlowPalette.red)
             }
 
             SiteFlowCard {
@@ -100,14 +144,18 @@ struct FinancialsView: View {
         }
     }
 
-    private func monthlyCollection(_ months: [FinancialsMonth], year: Int) -> some View {
+    private func monthlyCollection(_ months: [FinancialsMonth], year: Int, settings: MobileFinancialSettings) -> some View {
         SiteFlowCard {
-            SiteFlowSectionHeader("Monthly Cash Flow")
+            SiteFlowSectionHeader("Monthly Snapshot")
             Text(String(year))
                 .font(.system(size: 13, weight: .medium))
                 .foregroundStyle(SiteFlowPalette.slate)
 
-            ForEach(months.filter { $0.contracted > 0 || $0.billed > 0 || $0.collected > 0 }) { month in
+            let visibleMonths = months.filter {
+                $0.contracted > 0 || $0.billed > 0 || $0.collected > 0 || $0.trackedCosts > 0
+            }
+
+            ForEach(visibleMonths) { month in
                 VStack(alignment: .leading, spacing: 8) {
                     Text(monthLabel(month.month))
                         .font(.system(size: 14, weight: .semibold))
@@ -116,11 +164,71 @@ struct FinancialsView: View {
                     amountRow("Contracted", month.contracted, tint: SiteFlowPalette.ink)
                     amountRow("Billed", month.billed, tint: SiteFlowPalette.blue)
                     amountRow("Collected", month.collected, tint: SiteFlowPalette.teal)
+
+                    if settings.includeChangeOrders, month.changeOrders > 0 {
+                        amountRow("Approved COs", month.changeOrders, tint: SiteFlowPalette.teal)
+                    }
+
+                    if month.trackedCosts > 0 {
+                        amountRow("Tracked Costs", month.trackedCosts, tint: SiteFlowPalette.amber)
+                        amountRow("Net Collected", month.netCollected, tint: month.netCollected >= 0 ? SiteFlowPalette.teal : SiteFlowPalette.red)
+                    }
                 }
                 .padding(.vertical, 4)
 
-                if month.id != months.last?.id {
+                if month.id != visibleMonths.last?.id {
                     Divider()
+                }
+            }
+        }
+    }
+
+    private func laborSection(_ summary: FinancialsSummary) -> some View {
+        SiteFlowCard {
+            SiteFlowSectionHeader("Labor")
+            HStack {
+                amountLabel("Labor Cost", value: summary.laborCost, tint: SiteFlowPalette.amber)
+                Spacer()
+                statLabel("Hours", value: "\(Int(summary.laborHours.rounded()))")
+            }
+        }
+    }
+
+    private func receiptSection(total: Double, categories: [MobileReceiptCategory], included: Bool) -> some View {
+        SiteFlowCard {
+            SiteFlowSectionHeader("Receipts")
+            HStack {
+                amountLabel("Receipt Total", value: total, tint: SiteFlowPalette.amber)
+                Spacer()
+                statLabel("Included", value: included ? "Yes" : "No")
+            }
+
+            if categories.isEmpty {
+                Text("No receipt categories yet.")
+                    .font(.system(size: 13))
+                    .foregroundStyle(SiteFlowPalette.slate)
+            } else {
+                Divider()
+
+                ForEach(Array(categories.enumerated()), id: \.element.id) { index, category in
+                    VStack(alignment: .leading, spacing: 6) {
+                        HStack {
+                            Text(category.category)
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundStyle(SiteFlowPalette.ink)
+                            Spacer()
+                            Text(formatCurrency(category.total))
+                                .font(.system(size: 13, weight: .semibold))
+                                .foregroundStyle(SiteFlowPalette.amber)
+                        }
+                        Text("\(category.count) receipt\(category.count == 1 ? "" : "s")")
+                            .font(.system(size: 12))
+                            .foregroundStyle(SiteFlowPalette.slate)
+                    }
+
+                    if index < categories.count - 1 {
+                        Divider()
+                    }
                 }
             }
         }
@@ -217,6 +325,35 @@ struct FinancialsView: View {
             Text(formatCurrency(value))
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(tint)
+        }
+    }
+
+    private func statLabel(_ label: String, value: String) -> some View {
+        VStack(alignment: .trailing, spacing: 2) {
+            Text(label)
+                .font(.system(size: 11, weight: .medium))
+                .foregroundStyle(SiteFlowPalette.slate)
+            Text(value)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(SiteFlowPalette.ink)
+        }
+    }
+
+    private func ruleRow(title: String, values: [String]) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(SiteFlowPalette.slate)
+
+            ForEach(values, id: \.self) { value in
+                Text(value)
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(SiteFlowPalette.ink)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 7)
+                    .background(SiteFlowPalette.tealSoft)
+                    .clipShape(Capsule())
+            }
         }
     }
 

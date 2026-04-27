@@ -12,6 +12,7 @@ struct SettingsView: View {
             profileSection
             invoiceSection
             crewSection
+            financialSection
             accountSection
         }
         .navigationTitle("Settings")
@@ -38,6 +39,18 @@ struct SettingsView: View {
         Section("Crew & Time Tracking") {
             toggleRow(title: "Track Worker Time", value: appModel.bootstrap?.settings?.trackWorkerTime ?? false)
             toggleRow(title: "Track Worker by Job", value: appModel.bootstrap?.settings?.trackWorkerJob ?? false)
+        }
+    }
+
+    private var financialSection: some View {
+        Section("Financial Rules") {
+            toggleRow(title: "Include Labor", value: appModel.bootstrap?.settings?.financialIncludeLabor ?? true)
+            toggleRow(title: "Include Receipts", value: appModel.bootstrap?.settings?.financialIncludeReceipts ?? true)
+            toggleRow(title: "Include Approved Change Orders", value: appModel.bootstrap?.settings?.financialIncludeChangeOrders ?? true)
+            toggleRow(title: "Show Labor Breakdown", value: appModel.bootstrap?.settings?.financialShowLaborBreakdown ?? true)
+            toggleRow(title: "Show Receipt Breakdown", value: appModel.bootstrap?.settings?.financialShowReceiptBreakdown ?? true)
+        } footer: {
+            Text("These rules are managed from the main SiteFlo dashboard and control what the app includes in financial reporting.")
         }
     }
 
